@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "430495517553",
+    "project_id": "licentazinca",
+    "storage_bucket": "licentazinca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:430495517553:android:77d6d61837f55e205604d0",
+        "android_client_info": {
+          "package_name": "com.example.camera"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9wjgImd2mO7VLu-veQWuEPdU9raDXAP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
