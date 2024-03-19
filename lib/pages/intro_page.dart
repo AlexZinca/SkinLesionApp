@@ -19,32 +19,62 @@ class _IntroPageState extends State<IntroPage> {
   final TextEditingController usernameController = TextEditingController();
 
   bool _passwordVisible = false;
-  bool rememberEmail = false;
+  bool rememberCredentials = false;
   final storage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _loadUserEmail();
+    _loadUserCredentials();
   }
 
-  Future<void> _loadUserEmail() async {
-    String? userEmail = await storage.read(key: 'userEmail');
-    if (userEmail != null) {
-      setState(() {
-        emailController.text = userEmail;
-        rememberEmail = true;
-      });
+  Future<void> _loadUserCredentials() async {
+    try {
+      String? remember = await storage.read(key: 'rememberCredentials');
+      bool shouldRemember = remember == 'true';
+
+      if (shouldRemember) {
+        String? userEmail = await storage.read(key: 'userEmail');
+        String? userPassword = await storage.read(key: 'userPassword');
+
+        setState(() {
+          if (userEmail != null && userPassword != null) {
+            emailController.text = userEmail;
+            passwordController.text = userPassword;
+            rememberCredentials = true;
+          } else {
+            rememberCredentials = false;
+          }
+        });
+      } else {
+        _clearCredentials(); // Clear credentials if not remembering
+      }
+    } catch (e) {
+      print('Error loading credentials: $e');
     }
   }
 
-  Future<void> _rememberUserEmail() async {
-    if (rememberEmail) {
+
+  Future<void> _rememberUserCredentials() async {
+    if (rememberCredentials) {
       await storage.write(key: 'userEmail', value: emailController.text);
+      await storage.write(key: 'userPassword', value: passwordController.text);
     } else {
       await storage.delete(key: 'userEmail');
+      await storage.delete(key: 'userPassword');
     }
   }
+
+  Future<void> _clearCredentials() async {
+    await storage.delete(key: 'userEmail');
+    await storage.delete(key: 'userPassword');
+    setState(() {
+      emailController.clear();
+      passwordController.clear();
+      rememberCredentials = false;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -190,114 +220,115 @@ class _IntroPageState extends State<IntroPage> {
                   ),
                 ),
                 SizedBox(height: 5),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () async {
-                      if (emailController.text.isEmpty) {
-                        // Show an alert dialog if the email field is empty
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text('Error'),
-                            content: Text(
-                                'Please enter your email address to reset your password.'),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text('OK'),
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // Dismiss the dialog
-                                },
-                              ),
-                            ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: CheckboxListTile(
+                        value: rememberCredentials,
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        onChanged: (bool? value) {
+                          setState(() {
+                            rememberCredentials = value!;
+                          });
+                          if (rememberCredentials) {
+                            _rememberUserCredentials();
+                          } else {
+                            _clearCredentials();
+                          }
+                          // Save the preference as well
+                          storage.write(key: 'rememberCredentials', value: rememberCredentials ? 'true' : 'false');
+                        },
+                        title: Text(
+                          "Remember credentials",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
                           ),
-                        );
-                      } else {
-                        try {
-                          // Send a password reset email
-                          await AuthService()
-                              .sendPasswordResetEmail(emailController.text);
-                          // Show a confirmation dialog
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text('Email Sent'),
-                              content: Text(
-                                  'Check your email to reset your password.'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pop(); // Dismiss the dialog
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        } catch (error) {
-                          // Handle errors (e.g., user not found)
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        if (emailController.text.isEmpty) {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                               title: Text('Error'),
-                              content: Text(error.toString()),
+                              content: Text('Please enter your email address to reset your password.'),
                               actions: <Widget>[
                                 TextButton(
-                                  child: Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pop(); // Dismiss the dialog
-                                  },
+                                  child: Text('OK', style: TextStyle(color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7))),
+                                  onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ],
                             ),
                           );
+                        } else {
+                          try {
+                            await AuthService().sendPasswordResetEmail(emailController.text);
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Email Sent'),
+                                content: Text('Check your email to reset your password.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('OK', style: TextStyle(color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7))),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } catch (error) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Error'),
+                                content: Text(error.toString()),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('OK', style: TextStyle(color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7))),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         }
-                      }
-                    },
-                    child: Text('Forgot?',
+                      },
+                      child: Text(
+                        'Forgot?',
                         style: TextStyle(
-                            fontSize: 14,
-                            color: Color.fromARGB(255, 94, 184, 209)
-                                .withOpacity(0.7))),
-                  ),
+                          fontSize: 14,
+                          color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 20),
 
-                CheckboxListTile(
-                  value: rememberEmail,
-                  contentPadding: EdgeInsets.zero, // Adjust padding to match your design
-                  controlAffinity: ListTileControlAffinity.leading, // Position the checkbox at the start of the tile
-                  onChanged: (bool? value) {
-                    setState(() {
-                      rememberEmail = value!;
-                    });
-                  },
-                  title: Text("Remember my email"),
-                ),
+                SizedBox(height: 20),
 
                 Row(
                   children: [
                     Spacer(),
                     InkWell(
                       onTap: () async {
-                        if (emailController.text.isEmpty ||
-                            passwordController.text.isEmpty) {
+                        if (emailController.text.isEmpty || passwordController.text.isEmpty) {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                               title: Text('Login failed'),
-                              content: Text(
-                                  'Please enter both your email and password.'),
+                              content: Text('Please enter both your email and password.'),
                               actions: <Widget>[
                                 TextButton(
                                   child: Text(
                                     'OK',
                                     style: TextStyle(
-                                      color: Color.fromARGB(255, 94, 184,
-                                          209), // Customize your color here for the button text
+                                      color: Color.fromARGB(255, 94, 184, 209), // Customize your color here for the button text
                                     ),
                                   ),
                                   onPressed: () => Navigator.of(context).pop(),
@@ -308,45 +339,25 @@ class _IntroPageState extends State<IntroPage> {
                           return;
                         }
 
-                        FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
-                          email: emailController.text.trim(),
-                          password: passwordController.text.trim(),
-                        )
-                            .then((authResult) {
+                        try {
+                          UserCredential authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                          );
+
                           if (authResult.user != null) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => HomePage()));
+                            if (rememberCredentials) {
+                              await _rememberUserCredentials(); // Save the email when logging in
+                            } else {
+                              await storage.delete(key: 'userCredentials'); // Clear if not remembering
+                            }
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
                           } else {
-                            // Assuming you have a method to handle a failed login attempt.
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('Login Failed'),
-                                content: Text(
-                                    'The login attempt failed. Please try again.'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(
-                                      'OK',
-                                      style: TextStyle(
-                                        color: Color.fromARGB(255, 94, 184,
-                                            209), // Customize your color here for the button text
-                                      ),
-                                    ),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                  ),
-                                ],
-                              ),
-                            );
+                            // Login failed logic here (this might not be necessary as an exception should be thrown on failure)
                           }
-                        }).catchError((e) {
+                        } catch (e) {
                           // Handling the error.
-                          String errorMessage =
-                              'An error occurred. Please try again.';
+                          String errorMessage = 'An error occurred. Please try again.';
                           if (e is FirebaseAuthException) {
                             errorMessage = e.message ?? errorMessage;
                           }
@@ -361,8 +372,7 @@ class _IntroPageState extends State<IntroPage> {
                                   child: Text(
                                     'OK',
                                     style: TextStyle(
-                                      color: Color.fromARGB(255, 94, 184,
-                                          209), // Customize your color here for the button text
+                                      color: Color.fromARGB(255, 94, 184, 209), // Customize your color here for the button text
                                     ),
                                   ),
                                   onPressed: () => Navigator.of(context).pop(),
@@ -370,11 +380,10 @@ class _IntroPageState extends State<IntroPage> {
                               ],
                             ),
                           );
-                        });
+                        }
                       },
                       child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 44, vertical: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 44, vertical: 20),
                         decoration: loginButtonDecoration,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -390,6 +399,7 @@ class _IntroPageState extends State<IntroPage> {
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ],
