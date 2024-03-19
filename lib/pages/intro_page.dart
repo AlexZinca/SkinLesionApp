@@ -2,23 +2,61 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_camera/pages/home_page.dart';
 import 'package:my_camera/pages/sign_up.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/auth.dart';
 
-class IntroPage extends StatelessWidget {
+class IntroPage extends StatefulWidget {
   IntroPage({Key? key}) : super(key: key);
+
+  @override
+  _IntroPageState createState() => _IntroPageState();
+}
+
+class _IntroPageState extends State<IntroPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+
+  bool _passwordVisible = false;
+  bool rememberEmail = false;
+  final storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmail();
+  }
+
+  Future<void> _loadUserEmail() async {
+    String? userEmail = await storage.read(key: 'userEmail');
+    if (userEmail != null) {
+      setState(() {
+        emailController.text = userEmail;
+        rememberEmail = true;
+      });
+    }
+  }
+
+  Future<void> _rememberUserEmail() async {
+    if (rememberEmail) {
+      await storage.write(key: 'userEmail', value: emailController.text);
+    } else {
+      await storage.delete(key: 'userEmail');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    InputDecoration getInputDecoration(String hintText, IconData icon) {
+    InputDecoration getInputDecoration(String hintText, IconData icon,
+        {Widget? suffixIcon}) {
       return InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
             color: Colors.grey,
             fontWeight: FontWeight.w300), // Make text slimmer
         prefixIcon: Icon(icon, color: Colors.grey),
+        suffixIcon: suffixIcon,
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -107,7 +145,7 @@ class IntroPage extends StatelessWidget {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.27),
                 Text('Login',
                     style:
-                    TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
                 SizedBox(height: 3),
                 Text('Please sign in to continue',
                     style: TextStyle(fontSize: 15, color: Colors.grey)),
@@ -116,8 +154,8 @@ class IntroPage extends StatelessWidget {
                 Container(
                   decoration: textFieldDecoration,
                   child: TextField(
-                    controller: emailController,// TextInputType.emailAddress,
-                    decoration: getInputDecoration('Username', Icons.person),
+                    controller: emailController, // TextInputType.emailAddress,
+                    decoration: getInputDecoration('Email', Icons.person),
                   ),
                 ),
                 SizedBox(height: 14),
@@ -126,8 +164,29 @@ class IntroPage extends StatelessWidget {
                   decoration: textFieldDecoration,
                   child: TextField(
                     controller: passwordController,
-                    obscureText: true,
-                    decoration: getInputDecoration('Password', Icons.lock),
+                    obscureText: !_passwordVisible,
+                    decoration: getInputDecoration(
+                      'Password',
+                      Icons.lock,
+                      suffixIcon: Transform.translate(
+                        offset: Offset(
+                            -10, 0), // Shifts the icon 10 pixels to the left
+                        child: IconButton(
+                          icon: Icon(
+                            // Toggle the icon based on password visibility
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(height: 5),
@@ -141,12 +200,14 @@ class IntroPage extends StatelessWidget {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: Text('Error'),
-                            content: Text('Please enter your email address to reset your password.'),
+                            content: Text(
+                                'Please enter your email address to reset your password.'),
                             actions: <Widget>[
                               TextButton(
                                 child: Text('OK'),
                                 onPressed: () {
-                                  Navigator.of(context).pop(); // Dismiss the dialog
+                                  Navigator.of(context)
+                                      .pop(); // Dismiss the dialog
                                 },
                               ),
                             ],
@@ -155,18 +216,21 @@ class IntroPage extends StatelessWidget {
                       } else {
                         try {
                           // Send a password reset email
-                          await AuthService().sendPasswordResetEmail(emailController.text);
+                          await AuthService()
+                              .sendPasswordResetEmail(emailController.text);
                           // Show a confirmation dialog
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                               title: Text('Email Sent'),
-                              content: Text('Check your email to reset your password.'),
+                              content: Text(
+                                  'Check your email to reset your password.'),
                               actions: <Widget>[
                                 TextButton(
                                   child: Text('OK'),
                                   onPressed: () {
-                                    Navigator.of(context).pop(); // Dismiss the dialog
+                                    Navigator.of(context)
+                                        .pop(); // Dismiss the dialog
                                   },
                                 ),
                               ],
@@ -183,7 +247,8 @@ class IntroPage extends StatelessWidget {
                                 TextButton(
                                   child: Text('OK'),
                                   onPressed: () {
-                                    Navigator.of(context).pop(); // Dismiss the dialog
+                                    Navigator.of(context)
+                                        .pop(); // Dismiss the dialog
                                   },
                                 ),
                               ],
@@ -195,26 +260,46 @@ class IntroPage extends StatelessWidget {
                     child: Text('Forgot?',
                         style: TextStyle(
                             fontSize: 14,
-                            color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7))),
+                            color: Color.fromARGB(255, 94, 184, 209)
+                                .withOpacity(0.7))),
                   ),
-
                 ),
                 SizedBox(height: 20),
+
+                CheckboxListTile(
+                  value: rememberEmail,
+                  contentPadding: EdgeInsets.zero, // Adjust padding to match your design
+                  controlAffinity: ListTileControlAffinity.leading, // Position the checkbox at the start of the tile
+                  onChanged: (bool? value) {
+                    setState(() {
+                      rememberEmail = value!;
+                    });
+                  },
+                  title: Text("Remember my email"),
+                ),
+
                 Row(
                   children: [
                     Spacer(),
                     InkWell(
                       onTap: () async {
-                        // Ensure the email and password fields are not empty
-                        if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+                        if (emailController.text.isEmpty ||
+                            passwordController.text.isEmpty) {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: Text('Error'),
-                              content: Text('Please enter both your email and password.'),
+                              title: Text('Login failed'),
+                              content: Text(
+                                  'Please enter both your email and password.'),
                               actions: <Widget>[
                                 TextButton(
-                                  child: Text('OK'),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 94, 184,
+                                          209), // Customize your color here for the button text
+                                    ),
+                                  ),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ],
@@ -223,48 +308,73 @@ class IntroPage extends StatelessWidget {
                           return;
                         }
 
-                        // Attempt to sign in the user
-                        try {
-                          var user = await AuthService().signInWithEmailAndPassword(
-                            emailController.text.trim(),
-                            passwordController.text,
-                          );
-
-                          if (user != null) {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                        FirebaseAuth.instance
+                            .signInWithEmailAndPassword(
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
+                        )
+                            .then((authResult) {
+                          if (authResult.user != null) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage()));
+                          } else {
+                            // Assuming you have a method to handle a failed login attempt.
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Login Failed'),
+                                content: Text(
+                                    'The login attempt failed. Please try again.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text(
+                                      'OK',
+                                      style: TextStyle(
+                                        color: Color.fromARGB(255, 94, 184,
+                                            209), // Customize your color here for the button text
+                                      ),
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                  ),
+                                ],
+                              ),
+                            );
                           }
-                        } on FirebaseAuthException catch (e) {
-                          String message = '';
-                          switch (e.code) {
-                            case 'user-not-found':
-                            case 'invalid-email':
-                              message = 'No user found with this email address.';
-                              break;
-                            case 'wrong-password':
-                              message = 'Incorrect password provided.';
-                              break;
-                            default:
-                              message = 'An error occurred. Please try again later.';
+                        }).catchError((e) {
+                          // Handling the error.
+                          String errorMessage =
+                              'An error occurred. Please try again.';
+                          if (e is FirebaseAuthException) {
+                            errorMessage = e.message ?? errorMessage;
                           }
 
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                               title: Text('Login Failed'),
-                              content: Text(message),
+                              content: Text(errorMessage),
                               actions: <Widget>[
                                 TextButton(
-                                  child: Text('OK'),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 94, 184,
+                                          209), // Customize your color here for the button text
+                                    ),
+                                  ),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ],
                             ),
                           );
-                        }
+                        });
                       },
                       child: Container(
                         padding:
-                        EdgeInsets.symmetric(horizontal: 44, vertical: 20),
+                            EdgeInsets.symmetric(horizontal: 44, vertical: 20),
                         decoration: loginButtonDecoration,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -329,7 +439,7 @@ class IntroPage extends StatelessWidget {
                       text: 'Sign up',
                       style: TextStyle(
                         color:
-                        Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                            Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
