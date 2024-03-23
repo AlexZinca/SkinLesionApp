@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:my_camera/pages/intro_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'camera_page.dart'; // Ensure this import is correct.
+
+// Inside an async method
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -17,6 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool biometricAuth = true;
   final FlutterSecureStorage storage = FlutterSecureStorage();
   Color switchColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7);
+
 
   @override
   void initState() {
@@ -69,10 +73,46 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void _showDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Closes the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      await user?.delete();
+      // Handle post-deletion logic, like navigating to a sign-up screen.
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => IntroPage()),
+            (Route<dynamic> route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      // Handle errors, for instance, show an error dialog
+      _showDialog('Error', 'Failed to delete account: ${e.message}');
+    }
+  }
+
+
   Future<void> _showFeedbackDialog() async {
     final TextEditingController _feedbackController = TextEditingController();
     final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7); // Define your green color
-
     // Use showDialog with Theme widget to override the color scheme for the dialog
     await showDialog(
       context: context,
@@ -124,6 +164,71 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
   }
+
+  Future<void> _showAboutAppDialog() async {
+    final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7); // Define your green color
+    final textColor = Color.fromARGB(255, 145, 145, 145).withOpacity(0.7);
+    // For dynamic version, use package_info package to fetch version.
+    // For now, let's hardcode a version.
+    String appVersion = '1.0.0'; // Example version
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('About App'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('This app is built using Flutter.', style: TextStyle(color: textColor)),
+                SizedBox(height: 10),
+                Text('Version: '+appVersion, style: TextStyle(color: textColor)),
+                // Add more details here as needed
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close', style: TextStyle(color: greenColor)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showDeleteAccountDialog() async {
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Account'),
+          content: Text('Are you sure you want to delete your account? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _deleteAccount(); // Proceed with deleting the account
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,7 +281,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       'Learn more about the application',
                       style: TextStyle(fontSize: 13), // Smaller text size
                     ),
+                    onTap: _showAboutAppDialog,
                   ), // Your other ListTiles for Feedback and About app...
+                  ListTile(
+                    title: Text(
+                      'Delete Account',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    subtitle: Text(
+                      'Permanently delete your account and data',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    onTap: _showDeleteAccountDialog,
+                  ),
                 ],
               ),
             ),
