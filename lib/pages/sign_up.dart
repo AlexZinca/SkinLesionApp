@@ -96,7 +96,7 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom !=0;
+    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
     InputDecoration getInputDecoration(String hintText, IconData icon, {bool isObscure = false, VoidCallback? toggleVisibility}) {
       return InputDecoration(
         hintText: hintText,
@@ -169,18 +169,16 @@ class _SignUpState extends State<SignUp> {
               ),
             ),
           ),
-           AnimatedPadding(
+           Container(
               padding: EdgeInsets.symmetric(horizontal: 30.0),
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOut,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.2),  // Adjust the spacing
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.12),  // Adjust the spacing
                   Text('Sign up', style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),  // Adjust the spacing
                   Text('Create your account', style: TextStyle(fontSize: 15, color: Colors.grey)),
-                  SizedBox(height: 30),  // Adjust the spacing
+                  SizedBox(height: 40),  // Adjust the spacing
                   // TextField for username, email, password and confirm password
                   Container(
                     decoration: textFieldDecoration,
@@ -189,7 +187,7 @@ class _SignUpState extends State<SignUp> {
                       decoration: getInputDecoration('Username', Icons.person),
                     ),
                   ),
-                  SizedBox(height: 15),
+                  SizedBox(height: 10),
                   Container(
                     decoration: textFieldDecoration,
                     child: TextField(
@@ -197,7 +195,7 @@ class _SignUpState extends State<SignUp> {
                       decoration: getInputDecoration('Email', Icons.email),
                     ),
                   ),
-                  SizedBox(height: 15),
+                  SizedBox(height: 10),
                   Container(
                     decoration: textFieldDecoration,
                     child: TextField(
@@ -206,7 +204,7 @@ class _SignUpState extends State<SignUp> {
                       decoration: getInputDecoration('Password', Icons.lock, isObscure: true, toggleVisibility: _togglePasswordVisibility),
                     ),
                   ),
-                  SizedBox(height: 15),
+                  SizedBox(height: 10),
                   Container(
                     decoration: textFieldDecoration,
                     child: TextField(
@@ -215,7 +213,7 @@ class _SignUpState extends State<SignUp> {
                       decoration: getInputDecoration('Confirm Password', Icons.lock, isObscure: true, toggleVisibility: _toggleConfirmPasswordVisibility),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 140),
                   // SIGN UP button
                   Center(
                     child: InkWell(
@@ -234,7 +232,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 110),  // Adjust the spacing
+                  SizedBox(height: 100),  // Adjust the spacing
                   Center(
                     child: GestureDetector(
                       onTap: () {
