@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Make sure Firebase is initialized in your project
+import 'package:flutter/widgets.dart';
 import 'package:my_camera/pages/intro_page.dart';
-import '../services/auth.dart';
 
 class SignUp extends StatefulWidget {
   SignUp({Key? key}) : super(key: key);
@@ -20,8 +22,6 @@ class _SignUpState extends State<SignUp> {
   bool _confirmPasswordVisible = false;
 
   void _register() async {
-
-
     if (!EmailValidator.validate(emailController.text)) {
       _showDialog('Invalid Email', 'Please enter a valid email address.');
       return;
@@ -29,7 +29,8 @@ class _SignUpState extends State<SignUp> {
 
     if (emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty || usernameController.text.isEmpty) {
+        confirmPasswordController.text.isEmpty ||
+        usernameController.text.isEmpty) {
       _showDialog('Missing Fields', 'Please fill in all the fields.');
       return;
     }
@@ -39,12 +40,26 @@ class _SignUpState extends State<SignUp> {
       return;
     }
 
-    var user = await AuthService().registerWithEmailAndPassword(
-        emailController.text, passwordController.text);
-    if (user != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => IntroPage()));
-    } else {
-      _showDialog('Registration Failed', 'An error occurred during registration. Please try again.');
+    try {
+      // Using Firebase Authentication to register the user
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      if (userCredential.user != null) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => IntroPage()));
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage = 'An error occurred during registration. Please try again.';
+      if (e.code == 'weak-password') {
+        errorMessage = 'The password provided is too weak.';
+      } else if (e.code == 'email-already-in-use') {
+        errorMessage = 'An account already exists for that email.';
+      }
+      _showDialog('Registration Failed', errorMessage);
+    } catch (e) {
+      _showDialog('Error', 'An unexpected error occurred. Please try again.');
     }
   }
 
@@ -67,9 +82,21 @@ class _SignUpState extends State<SignUp> {
       },
     );
   }
+  void _togglePasswordVisibility() {
+    setState(() {
+      _passwordVisible = !_passwordVisible;
+    });
+  }
+
+  void _toggleConfirmPasswordVisibility() {
+    setState(() {
+      _confirmPasswordVisible = !_confirmPasswordVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom !=0;
     InputDecoration getInputDecoration(String hintText, IconData icon, {bool isObscure = false, VoidCallback? toggleVisibility}) {
       return InputDecoration(
         hintText: hintText,
@@ -77,7 +104,10 @@ class _SignUpState extends State<SignUp> {
         prefixIcon: Icon(icon, color: Colors.grey),
         suffixIcon: isObscure
             ? IconButton(
-          icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
+          icon: Icon(
+              toggleVisibility == _togglePasswordVisibility ? (_passwordVisible ? Icons.visibility : Icons.visibility_off) : (_confirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
+              color: Colors.grey
+          ),
           onPressed: toggleVisibility,
         )
             : null,
@@ -111,48 +141,51 @@ class _SignUpState extends State<SignUp> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Stack(
+      body: GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Stack(
         children: [
           Positioned(
-            top: -63,
-            right: -140,
-            child: Transform.rotate(
-              angle: 2.4,
-              child: ClipPath(
-                clipper: RoundedDiagonalPathClipper(),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 1.1,
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 255, 255, 255).withOpacity(0.7),
-                        Color.fromARGB(255, 110, 196, 219).withOpacity(0.7),
-                      ],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                ),
+            top: -100, // Adjusted for top right alignment
+            right: -40, // Adjusted for top right alignment
+            child: CircleDecoration(
+              diameter: 300,
+              gradient: LinearGradient(
+                colors: [Color.fromARGB(255, 151, 199, 212).withOpacity(0.7), Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
-          SingleChildScrollView(  // Allows the column to be scrollable, preventing overflow
-            child: Container(
+          Positioned(
+            bottom: -120, // Adjusted for bottom alignment
+            right: -160, // Adjusted for bottom alignment
+            child: CircleDecoration(
+              diameter: 400,
+              gradient: LinearGradient(
+                colors: [Color.fromARGB(255, 151, 199, 212).withOpacity(0.7), Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+           AnimatedPadding(
               padding: EdgeInsets.symmetric(horizontal: 30.0),
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOut,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   SizedBox(height: MediaQuery.of(context).size.height * 0.2),  // Adjust the spacing
                   Text('Sign up', style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 20),  // Adjust the spacing
+                  SizedBox(height: 10),  // Adjust the spacing
                   Text('Create your account', style: TextStyle(fontSize: 15, color: Colors.grey)),
                   SizedBox(height: 30),  // Adjust the spacing
                   // TextField for username, email, password and confirm password
                   Container(
                     decoration: textFieldDecoration,
                     child: TextField(
-                      keyboardType: TextInputType.emailAddress,
+                      controller: usernameController,
                       decoration: getInputDecoration('Username', Icons.person),
                     ),
                   ),
@@ -170,11 +203,7 @@ class _SignUpState extends State<SignUp> {
                     child: TextField(
                       controller: passwordController,
                       obscureText: !_passwordVisible,
-                      decoration: getInputDecoration('Password', Icons.lock, isObscure: true, toggleVisibility: () {
-                        setState(() {
-                          _passwordVisible = !_passwordVisible;
-                        });
-                      }),
+                      decoration: getInputDecoration('Password', Icons.lock, isObscure: true, toggleVisibility: _togglePasswordVisibility),
                     ),
                   ),
                   SizedBox(height: 15),
@@ -183,11 +212,7 @@ class _SignUpState extends State<SignUp> {
                     child: TextField(
                       controller: confirmPasswordController,
                       obscureText: !_confirmPasswordVisible,
-                      decoration: getInputDecoration('Confirm Password', Icons.lock, isObscure: true, toggleVisibility: () {
-                        setState(() {
-                          _confirmPasswordVisible = !_confirmPasswordVisible;
-                        });
-                      }),
+                      decoration: getInputDecoration('Confirm Password', Icons.lock, isObscure: true, toggleVisibility: _toggleConfirmPasswordVisibility),
                     ),
                   ),
                   SizedBox(height: 30),
@@ -196,7 +221,7 @@ class _SignUpState extends State<SignUp> {
                     child: InkWell(
                       onTap: _register,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 44, vertical: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 120, vertical: 20),
                         decoration: loginButtonDecoration,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -209,7 +234,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 112),  // Adjust the spacing
+                  SizedBox(height: 110),  // Adjust the spacing
                   Center(
                     child: GestureDetector(
                       onTap: () {
@@ -234,14 +259,33 @@ class _SignUpState extends State<SignUp> {
                 ],
               ),
             ),
-          ),
         ],
       ),
+    ),
     );
 
   }
 }
 
+
+class CircleDecoration extends StatelessWidget {
+  final double diameter;
+  final LinearGradient gradient;
+
+  const CircleDecoration({Key? key, required this.diameter, required this.gradient}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: diameter,
+      height: diameter,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: gradient,
+      ),
+    );
+  }
+}
 class RoundedDiagonalPathClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
