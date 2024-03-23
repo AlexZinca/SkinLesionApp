@@ -15,6 +15,11 @@ class _CameraPageState extends State<CameraPage> {
   Future<void>? _initializeControllerFuture;
   final ImagePicker _picker = ImagePicker();
 
+  // Variables for tap-to-focus
+  bool _showFocusCircle = false;
+  double _focusX = 0;
+  double _focusY = 0;
+
   @override
   void initState() {
     super.initState();
@@ -25,7 +30,7 @@ class _CameraPageState extends State<CameraPage> {
     final cameras = await availableCameras();
     if (cameras.isNotEmpty) {
       final firstCamera = cameras.first;
-      _controller = CameraController(firstCamera, ResolutionPreset.medium);
+      _controller = CameraController(firstCamera, ResolutionPreset.max);
       _initializeControllerFuture = _controller!.initialize().then((_) {
         if (!mounted) return;
         setState(() {});
@@ -43,6 +48,63 @@ class _CameraPageState extends State<CameraPage> {
     //WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     super.dispose();
+  }
+
+  void _onTap(TapUpDetails details) async {
+    if (!_controller!.value.isInitialized) return;
+
+    final RenderBox box = context.findRenderObject() as RenderBox;
+    final Offset localPosition = box.globalToLocal(details.globalPosition);
+
+    // Calculate the position in the range of [0, 1]
+    final Size previewSize = box.size;
+    final double x = localPosition.dx / previewSize.width;
+    final double y = localPosition.dy / previewSize.height;
+    final Offset normalizedPosition = Offset(x, y);
+
+    try {
+      // Attempt to set focus and exposure.
+      await _controller!.setFocusPoint(normalizedPosition);
+      await _controller!.setExposurePoint(normalizedPosition);
+    } catch (e) {
+      // Handle or ignore the error
+      print("Error setting focus or exposure point: $e");
+    }
+
+    // Show focus circle
+    setState(() {
+      _showFocusCircle = true;
+      _focusX = localPosition.dx;
+      _focusY = localPosition.dy;
+    });
+
+    // Hide the focus circle after a delay
+    Future.delayed(Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() => _showFocusCircle = false);
+      }
+    });
+  }
+  // Method to set focus point
+  Future<void> _setFocusPoint(double x, double y) async {
+    if (_controller != null) {
+      _showFocusCircle = true;
+      _focusX = x;
+      _focusY = y;
+
+      // Convert to the Scale of 0 to 1 used by the camera for focus points
+      await _controller!.setFocusPoint(Offset(x, y));
+      await _controller!.setExposurePoint(Offset(x, y));
+
+      setState(() {});
+
+      // Hide focus circle after a delay
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          _showFocusCircle = false;
+        });
+      });
+    }
   }
 /*
   @override
@@ -62,11 +124,33 @@ class _CameraPageState extends State<CameraPage> {
 */
   @override
   Widget build(BuildContext context) {
+    // Obtain the size of the screen
+    final Size screenSize = MediaQuery.of(context).size;
+    // Assuming the CameraPreview is fullscreen. If not, adjust accordingly.
+    final double screenWidth = screenSize.width;
+    // Calculate the preview scale based on the screen and camera aspect ratios
+    final double screenAspectRatio = screenWidth / screenSize.height;
+    final double previewAspectRatio = _controller!.value.aspectRatio+200;
+    // Adjust the preview height to maintain the preview aspect ratio
+    final double previewHeight = screenWidth / previewAspectRatio;
+    final double previewScale = screenSize.height / previewHeight;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 0),
+      body: GestureDetector(
+          onTapUp: (details) {
+            final RenderBox box = context.findRenderObject() as RenderBox;
+            final Offset localPosition = box.globalToLocal(details.globalPosition);
+            // Adjust the tap position based on the preview scale
+            final Offset scaledPosition = Offset(
+              localPosition.dx / previewScale,
+              localPosition.dy / previewScale,
+            );
+            _onTap(scaledPosition as TapUpDetails);
+          },
+          child: Stack(
+            children:  [
+          GestureDetector(
+            onTapUp: _onTap, // Register tap event
             child: FutureBuilder<void>(
               future: _initializeControllerFuture,
               builder: (context, snapshot) {
@@ -79,7 +163,21 @@ class _CameraPageState extends State<CameraPage> {
             ),
           ),
           _buildControlBar(context),
-        ],
+          if (_showFocusCircle)
+            Positioned(
+              left: _focusX - 20,
+              top: _focusY - 20,
+              child: Container(
+                height: 50,
+                width: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+              ),
+            ),
+            ],
+          ),
       ),
     );
   }
