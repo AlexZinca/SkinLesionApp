@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:my_camera/pages/intro_page.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'camera_page.dart'; // Ensure this import is correct.
 
 class SettingsPage extends StatefulWidget {
@@ -55,6 +55,75 @@ class _SettingsPageState extends State<SettingsPage> {
         key: 'biometricAuth', value: biometricAuth ? 'true' : 'false');
   }
 
+  Future<void> _sendEmail(String feedbackText) async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'alexzinca@yahoo.com',
+      query: 'subject=App Feedback&body=$feedbackText', // Use URL encoding for proper query parameter formatting
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      throw 'Could not launch $emailUri';
+    }
+  }
+
+  Future<void> _showFeedbackDialog() async {
+    final TextEditingController _feedbackController = TextEditingController();
+    final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7); // Define your green color
+
+    // Use showDialog with Theme widget to override the color scheme for the dialog
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: greenColor, // Used for button text color
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: greenColor, // Used for button text
+              ),
+            ),
+          ),
+          child: AlertDialog(
+            title: Text('Feedback'),
+            content: TextField(
+              controller: _feedbackController,
+              decoration: InputDecoration(
+                hintText: 'Enter your feedback here...',
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: greenColor), // Green underline
+                ),
+              ),
+              autofocus: true,
+              cursorColor: greenColor, // Green cursor color
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Close', style: TextStyle(color: greenColor)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Send', style: TextStyle(color: greenColor)),
+                onPressed: () async {
+                  await _sendEmail(_feedbackController.text);
+
+                  Navigator.of(context).pop();
+                  // Assume you'll use an email plugin or backend service to send the email.
+                  // For example: sendEmail(_feedbackController.text);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,6 +164,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       'Send us your opinion about the application',
                       style: TextStyle(fontSize: 13), // Smaller text size
                     ),
+                    onTap: _showFeedbackDialog,
                     // Add logic for feedback here
                   ),
                   ListTile(
