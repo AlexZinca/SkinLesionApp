@@ -174,7 +174,7 @@ class _SignUpState extends State<SignUp> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.12),  // Adjust the spacing
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.14),  // Adjust the spacing
                   Text('Sign up', style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),  // Adjust the spacing
                   Text('Create your account', style: TextStyle(fontSize: 15, color: Colors.grey)),
@@ -213,7 +213,7 @@ class _SignUpState extends State<SignUp> {
                       decoration: getInputDecoration('Confirm Password', Icons.lock, isObscure: true, toggleVisibility: _toggleConfirmPasswordVisibility),
                     ),
                   ),
-                  SizedBox(height: 140),
+                  SizedBox(height: 100),
                   // SIGN UP button
                   Center(
                     child: InkWell(
@@ -222,7 +222,7 @@ class _SignUpState extends State<SignUp> {
                         padding: EdgeInsets.symmetric(horizontal: 120, vertical: 20),
                         decoration: loginButtonDecoration,
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisSize: MainAxisSize.max,
                           children: [
                             Text('SIGN UP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 19)),
                             SizedBox(width: 8),
@@ -232,7 +232,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 100),  // Adjust the spacing
+                  SizedBox(height: 107),  // Adjust the spacing
                   Center(
                     child: GestureDetector(
                       onTap: () {
