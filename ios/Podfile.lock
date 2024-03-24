@@ -128,7 +128,7 @@ SPEC CHECKSUMS:
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   GoogleUtilities: d053d902a8edaa9904e1bd00c37535385b8ed152
   GTMSessionFetcher: 8a1b34ad97ebe6f909fb8b9b77fba99943007556
-  image_cropper: a3291c624a953049bc6a02e1f8c8ceb162a24b25
+  image_cropper: 60c2789d1f1a78c873235d4319ca0c34a69f2d98
   image_picker_ios: 99dfe1854b4fa34d0364e74a78448a0151025425
   local_auth_darwin: c7e464000a6a89e952235699e32b329457608d98
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6

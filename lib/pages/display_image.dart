@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:image_cropper/image_cropper.dart';
 
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
@@ -32,6 +33,45 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   String scriptOutput = '';
   bool isProcessing = false;
 
+  //late String imagePath; // Local variable to hold the image path
+  late String displayImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    displayImagePath =
+        widget.imagePath; // Initialize with the widget's imagePath
+  }
+
+
+  Future<void> _cropImage() async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: widget.imagePath,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      androidUiSettings: AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.deepPurple,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false),
+      iosUiSettings: IOSUiSettings(
+        minimumAspectRatio: 1.0,
+      ),
+    );
+
+    if (croppedFile != null) {
+      setState(() {
+        displayImagePath = croppedFile.path; // Update the local variable
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double buttonsContainerHeight = 120.0;
@@ -47,14 +87,15 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.only(bottom: buttonsContainerHeight + 80),
+            padding: EdgeInsets.only(bottom: buttonsContainerHeight + 93.3),
             child: InteractiveViewer(
               panEnabled: false,
               boundaryMargin: EdgeInsets.all(0),
               minScale: 1,
               maxScale: 4,
               child: Image.file(
-                File(widget.imagePath),
+                File(displayImagePath), // Use displayImagePath here
+                //File(widget.imagePath),
                 fit: BoxFit.contain,
                 width: double.infinity,
                 height: double.infinity,
@@ -69,7 +110,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
               height: buttonsContainerHeight,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -79,17 +120,31 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 40),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                child: Column(
                   children: [
-                    _buildButton(context,
-                        icon: Icons.redo_rounded,
-                        label: 'Retake',
-                        onPressed: () => Navigator.of(context).pop()),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildButton(context,
+                            icon: Icons.redo_rounded,
+                            label: 'Retake',
+                            width: 170,
+                            onPressed: () => Navigator.of(context).pop()),
+                        _buildButton(
+                          context,
+                          icon: Icons.crop,
+                          label: 'Crop',
+                          width: 170,
+                          onPressed: _cropImage,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
                     _buildButton(
                       context,
                       icon: Icons.analytics,
                       label: 'Scan',
+                      width: 360,
                       onPressed: () async {
                         try {
                           var uri =
@@ -166,7 +221,9 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                           final errorMessage = e.toString();
                           print(errorMessage);
                           showDialog(
-                            context: Navigator.of(context).context,
+                            context: Navigator
+                                .of(context)
+                                .context,
                             builder: (BuildContext context) {
                               return AlertDialog(
                                 title: const Text('Error'),
@@ -186,6 +243,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                           );
                         }
                       },
+
                     ),
                   ],
                 ),
@@ -214,8 +272,15 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   Widget _buildButton(BuildContext context,
       {required IconData icon,
         required String label,
-        required VoidCallback onPressed}) {
+        required VoidCallback onPressed,
+        double? width}) {
+    // Optional width parameter
     return Container(
+      width: width ?? MediaQuery
+          .of(context)
+          .size
+          .width * 0.8,
+      // Use the width parameter or default to 80% of screen width
       padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -238,10 +303,14 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         onTap: onPressed,
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          // Center the icon and text
           children: [
             Icon(icon, color: Colors.white, size: 40.0),
-            SizedBox(width: 20),
-            Text(label, style: TextStyle(color: Colors.white, fontSize: 13.33)),
+            SizedBox(width: 10),
+            // A bit of spacing between the icon and text
+            Text(label, style: TextStyle(color: Colors.white, fontSize: 16)),
+            // Adjust font size as needed
           ],
         ),
       ),

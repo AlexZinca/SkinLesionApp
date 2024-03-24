@@ -112,58 +112,51 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _showFeedbackDialog() async {
     final TextEditingController _feedbackController = TextEditingController();
-    final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7); // Define your green color
-    // Use showDialog with Theme widget to override the color scheme for the dialog
+    // Assuming `greenColor` and `textColor` are defined at the class level
+    final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7);
+    final Color textColor = Color.fromARGB(255, 145, 145, 145).withOpacity(0.7);
+
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
-              primary: greenColor, // Used for button text color
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: greenColor, // Used for button text
-              ),
-            ),
-          ),
-          child: AlertDialog(
-            title: Text('Feedback'),
-            content: TextField(
+        return AlertDialog(
+          backgroundColor: Colors.white, // Ensure background color is white
+          title: Text('Feedback'), // Use textColor for title
+          content: SingleChildScrollView(
+            child: TextField(
               controller: _feedbackController,
               decoration: InputDecoration(
                 hintText: 'Enter your feedback here...',
+                hintStyle: TextStyle(color: textColor.withOpacity(0.7),fontWeight: FontWeight.w400), // Lighter text color for hint
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: greenColor), // Green underline
+                  borderSide: BorderSide(color: greenColor), // Green underline for focused border
                 ),
               ),
-              autofocus: true,
+              style: TextStyle(color: textColor), // Use textColor for input text
               cursorColor: greenColor, // Green cursor color
             ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Close', style: TextStyle(color: greenColor)),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text('Send', style: TextStyle(color: greenColor)),
-                onPressed: () async {
-                  await _sendEmail(_feedbackController.text);
-
-                  Navigator.of(context).pop();
-                  // Assume you'll use an email plugin or backend service to send the email.
-                  // For example: sendEmail(_feedbackController.text);
-                },
-              ),
-            ],
           ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close', style: TextStyle(color: greenColor)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Send', style: TextStyle(color: greenColor)),
+              onPressed: () async {
+                await _sendEmail(_feedbackController.text);
+                Navigator.of(context).pop();
+                // Optionally, handle the email sending logic here.
+              },
+            ),
+          ],
         );
       },
     );
   }
+
 
   Future<void> _showAboutAppDialog() async {
     final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7); // Define your green color
@@ -202,12 +195,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _showDeleteAccountDialog() async {
     // Show confirmation dialog
+    final textColor = Color.fromARGB(255, 145, 145, 145).withOpacity(0.7);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Delete Account'),
-          content: Text('Are you sure you want to delete your account? This action cannot be undone.'),
+          content: Text('Are you sure you want to delete your account? This action cannot be undone.',style: TextStyle(color: textColor) ),
           actions: <Widget>[
             TextButton(
               child: Text('Cancel', style: TextStyle(color: Colors.grey)),
