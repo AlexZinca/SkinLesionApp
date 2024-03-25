@@ -108,7 +108,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
             bottom: 0,
 
             child: Container(
-              height: 291,
+              height: 270,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
@@ -120,7 +120,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 42),
+                padding: const EdgeInsets.only(top: 30),
                 child: Column(
                   children: [
                     Row(

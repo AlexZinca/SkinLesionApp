@@ -19,6 +19,10 @@ class _CameraPageState extends State<CameraPage> {
   bool _showFocusCircle = false;
   double _focusX = 0;
   double _focusY = 0;
+  CameraDescription? _frontCamera;
+  CameraDescription? _backCamera;
+  bool _isRearCameraSelected = true; // start with the rear camera
+  bool _isTorchOn = false;
 
   @override
   void initState() {
@@ -26,21 +30,52 @@ class _CameraPageState extends State<CameraPage> {
     _initCamera();
   }
 
+  void _switchCamera() {
+    setState(() {
+      _isRearCameraSelected = !_isRearCameraSelected;
+      _controller = CameraController(
+        _isRearCameraSelected ? _backCamera! : _frontCamera!,
+        ResolutionPreset.max,
+      );
+      _initializeControllerFuture = _controller!.initialize();
+    });
+  }
+
+  void _toggleFlash() {
+    setState(() {
+      _isTorchOn = !_isTorchOn;
+      _controller!.setFlashMode(
+        _isTorchOn ? FlashMode.torch : FlashMode.off,
+      );
+    });
+  }
+
   Future<void> _initCamera() async {
     final cameras = await availableCameras();
-    if (cameras.isNotEmpty) {
-      final firstCamera = cameras.first;
-      _controller = CameraController(firstCamera, ResolutionPreset.max);
-      _initializeControllerFuture = _controller!.initialize().then((_) {
-        if (!mounted) return;
-        setState(() {});
-      }).catchError((e) {
-        print(e); // Handle any errors during camera initialization
-      });
-    } else {
-      print('No cameras available');
+
+    // Assign the cameras to front and back camera
+    for (var camera in cameras) {
+      if (camera.lensDirection == CameraLensDirection.front) {
+        _frontCamera = camera;
+      } else if (camera.lensDirection == CameraLensDirection.back) {
+        _backCamera = camera;
+      }
     }
+
+    // Start with the back camera
+    _controller = CameraController(
+      _backCamera!,
+      ResolutionPreset.max,
+    );
+
+    _initializeControllerFuture = _controller!.initialize().then((_) {
+      if (!mounted) return;
+      setState(() {});
+    }).catchError((e) {
+      print(e); // Handle any errors during camera initialization
+    });
   }
+
 
 
   @override
@@ -167,6 +202,25 @@ class _CameraPageState extends State<CameraPage> {
               },
             ),
           ),
+              Positioned(
+                top: 15.0, // Adjust the positioning as needed
+                right: 15.0,
+                child: Row(
+                  children: [
+                    _buildIconButton(
+                      context,
+                      icon: _isTorchOn ? Icons.flash_on : Icons.flash_off,
+                      onPressed: _toggleFlash,
+                    ),
+                    SizedBox(width: 15),
+                    _buildIconButton(
+                      context,
+                      icon: Icons.flip_camera_ios,
+                      onPressed: _switchCamera,
+                    ),
+                  ],
+                ),
+              ),
           _buildControlBar(context),
           if (_showFocusCircle)
             Positioned(
@@ -191,9 +245,9 @@ class _CameraPageState extends State<CameraPage> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 20.0),
+        padding: const EdgeInsets.only(bottom: 10.0),
         child: Container(
-          height: 150,
+          height: 110,
           decoration: BoxDecoration(
             color: Color.fromARGB(255, 255, 251, 254),
             borderRadius: BorderRadius.only(
@@ -209,56 +263,78 @@ class _CameraPageState extends State<CameraPage> {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            padding: const EdgeInsets.only(top: 30),
+            child: Column(
               children: [
-                _buildButton(
-                  context,
-                  icon: Icons.camera_alt,
-                  label: 'Capture',
-                  onPressed: () async {
-                    try {
-                      await _initializeControllerFuture;
-                      final image = await _controller!.takePicture();
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DisplayPictureScreen(imagePath: image.path),
-                        ),
-                      );
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildButton(
+                      context,
+                      icon: Icons.camera_alt,
+                      label: 'Capture',
+                      onPressed: () async {
+                        try {
+                          await _initializeControllerFuture;
+                          final image = await _controller!.takePicture();
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DisplayPictureScreen(imagePath: image.path),
+                            ),
+                          );
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                    ),
+                    _buildButton(
+                      context,
+                      icon: Icons.photo_library,
+                      label: 'Gallery',
+                      onPressed: () async {
+                        try {
+                          final XFile? image =
+                          await _picker.pickImage(source: ImageSource.gallery);
+                          if (image != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DisplayPictureScreen(imagePath: image.path),
+                              ),
+                            );
+                          } else {
+                            // Handle the case where the user cancels the picker.
+                            print('No image selected.');
+                          }
+                        } catch (e) {
+                          // Print or display any errors.
+                          print('Error occurred: $e');
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                _buildButton(
-                  context,
-                  icon: Icons.photo_library,
-                  label: 'Gallery',
-                  onPressed: () async {
-                    try {
-                      final XFile? image =
-                      await _picker.pickImage(source: ImageSource.gallery);
-                      if (image != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DisplayPictureScreen(imagePath: image.path),
-                          ),
-                        );
-                      } else {
-                        // Handle the case where the user cancels the picker.
-                        print('No image selected.');
-                      }
-                    } catch (e) {
-                      // Print or display any errors.
-                      print('Error occurred: $e');
-                    }
-                  },
+                //SizedBox(height: 20),
+               /* Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildIconButton(
+                      context,
+                      icon: _isTorchOn ? Icons.flash_off : Icons.flash_on,
+                      onPressed: _toggleFlash,
+                    ),
+                    _buildIconButton(
+                      context,
+                      icon: Icons.flip_camera_ios,
+                      onPressed: _switchCamera,
+                    ),
+                    SizedBox(width: 150),
+                  ],
                 ),
+*/
               ],
             ),
           ),
@@ -266,6 +342,28 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
+
+  Widget _buildIconButton(BuildContext context, {required IconData icon, required VoidCallback onPressed}) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color.fromARGB(255, 151, 199, 212).withOpacity(0.7),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.white),
+        onPressed: onPressed,
+      ),
+    );
+  }
+
 
   Widget _buildButton(BuildContext context,
       {required IconData icon,
