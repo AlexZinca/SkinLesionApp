@@ -87,7 +87,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.only(bottom: buttonsContainerHeight + 93.3),
+            padding: EdgeInsets.only(bottom: buttonsContainerHeight +94),
             child: InteractiveViewer(
               panEnabled: false,
               boundaryMargin: EdgeInsets.all(0),
@@ -105,9 +105,10 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 140,
+            bottom: 0,
+
             child: Container(
-              height: buttonsContainerHeight,
+              height: 260,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
@@ -119,7 +120,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 40),
+                padding: const EdgeInsets.only(top: 30),
                 child: Column(
                   children: [
                     Row(
@@ -139,7 +140,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 20),
                     _buildButton(
                       context,
                       icon: Icons.analytics,
@@ -152,9 +153,10 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                           var request = http.MultipartRequest('POST', uri)
                             ..files.add(await http.MultipartFile.fromPath(
                               'file',
-                              widget.imagePath,
+                              //widget.imagePath,
+                                displayImagePath,
                             ));
-
+                          print('a');
                           var response = await http.Response.fromStream(
                               await request.send());
 
@@ -250,9 +252,10 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
               ),
             ),
           ),
+
           if (isProcessing || scriptOutput.isNotEmpty)
             Positioned(
-              bottom: 10,
+              bottom: 20,
               left: 0,
               right: 0,
               child: Container(
