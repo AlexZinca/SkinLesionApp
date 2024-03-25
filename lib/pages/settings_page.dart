@@ -313,7 +313,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('LOGOUT',
+                      Text('   LOGOUT',
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

@@ -108,7 +108,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
             bottom: 0,
 
             child: Container(
-              height: 260,
+              height: 291,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
@@ -120,7 +120,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.only(top: 42),
                 child: Column(
                   children: [
                     Row(
@@ -140,7 +140,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 21),
                     _buildButton(
                       context,
                       icon: Icons.analytics,

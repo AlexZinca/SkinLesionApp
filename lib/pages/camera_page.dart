@@ -130,7 +130,11 @@ class _CameraPageState extends State<CameraPage> {
     final double screenWidth = screenSize.width;
     // Calculate the preview scale based on the screen and camera aspect ratios
     final double screenAspectRatio = screenWidth / screenSize.height;
-    final double previewAspectRatio = _controller!.value.aspectRatio+200;
+    double? previewAspectRatio=1;
+    if (_controller?.value.isInitialized ?? false) {
+      previewAspectRatio = _controller!.value.aspectRatio;
+    }
+    //final double previewAspectRatio = _controller!.value.aspectRatio+200;
     // Adjust the preview height to maintain the preview aspect ratio
     final double previewHeight = screenWidth / previewAspectRatio;
     final double previewScale = screenSize.height / previewHeight;
@@ -147,6 +151,7 @@ class _CameraPageState extends State<CameraPage> {
             );
             _onTap(scaledPosition as TapUpDetails);
           },
+        //onTapUp: _onTap, // Register tap event
           child: Stack(
             children:  [
           GestureDetector(

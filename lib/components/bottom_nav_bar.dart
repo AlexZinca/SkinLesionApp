@@ -26,7 +26,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
   Widget build(BuildContext context) {
     return Container(
       child: GNav(
-        padding: EdgeInsets.symmetric(horizontal: 22, vertical: 34), // Adjust padding here
+        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 34), // Adjust padding here
         gap: 4, // Adjust gap between icons
         color: Colors.grey[400],
         activeColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
@@ -45,23 +45,23 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
             iconColor: Colors.grey[400],
             onPressed: () => _onItemTapped(0),
           ),
-          GButton(
+          /*GButton(
             icon: Icons.person,
             iconColor: Colors.grey[400],
             onPressed: () => _onItemTapped(1),
-          ),
+          ),*/
           GButton(
             icon: Icons.code,
             iconColor: _selectedIndex == 2 ? Colors.red : Colors.white,
             leading: Container(
               margin: EdgeInsets.only(top: 4), // Adjust margin to move the icon up
-              width: 50,
+              width: 80,
               height: 50,
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                color: _selectedIndex == 2
+                color: _selectedIndex == 1
                     ? Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)
                     : Color.fromARGB(255, 170, 177, 179).withOpacity(0.7),
               ),
@@ -70,17 +70,17 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                 color: Colors.white,
               ),
             ),
-            onPressed: () => _onItemTapped(2),
+            onPressed: () => _onItemTapped(1),
           ),
-          GButton(
+          /*GButton(
             icon: Icons.notifications,
             iconColor: Colors.grey[400],
             onPressed: () => _onItemTapped(3),
-          ),
+          ),*/
           GButton(
             icon: Icons.widgets_rounded,
             iconColor: Colors.grey[400],
-            onPressed: () => _onItemTapped(4),
+            onPressed: () => _onItemTapped(2),
           ),
         ],
       ),

@@ -25,17 +25,17 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const MainPage(),
-    const UserPage(),
+   // const UserPage(),
     const CameraPage(),
-    const NotificationsPage(),
+    //const NotificationsPage(),
     const SettingsPage(),
   ];
 
   final List<String> _pageTitles = [
     "DASHBOARD",
-    "ACCOUNT DETAILS",
+    //"ACCOUNT DETAILS",
     "ANALYSE",
-    "NOTIFICATIONS",
+    //"NOTIFICATIONS",
     "SETTINGS",
   ];
 
