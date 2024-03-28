@@ -47,16 +47,108 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         widget.imagePath; // Initialize with the widget's imagePath
   }
 
+  
+/*  void x () async{
+    var databaseReference = FirebaseFirestore.instance;
+    CollectionReference collectionRef = databaseReference.collection('${Globals.qSN!.toLowerCase()}_attachments');
+
+    ImagePicker imagePicker = ImagePicker();
+    XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if(file == null) return;
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceFolderImg = referenceRoot.child('images');
+
+    final metadata = SettableMetadata(
+      contentType: 'image/jpeg',
+      customMetadata: {'picked-file-path': file.path},
+    );
+
+    Reference referenceImgToUpload = referenceFolderImg.child(uniqueFileName);
+
+    UploadTask uploadTask = referenceImgToUpload.putData(await file.readAsBytes(), metadata);
+
+    try{
+
+      uploadTask.whenComplete(()async{
+        final profilePicUrl = await referenceImgToUpload.getDownloadURL();
+        //profilePictureUrl = profilePicUrl;
+        print(profilePicUrl);
+
+        Map<String, String> dataToSend = {
+          'profilePic' : profilePicUrl
+        };
+
+        DocumentReference docRef = collectionRef.doc(Globals.usEmail);
+
+        var obj = await docRef.get();
+
+        if(obj.exists) {
+
+
+
+          try{
+            String lastPicUrl =  obj.get('profilePic');
+            final storageRef = FirebaseStorage.instance.ref();
+            final spaceRef = storageRef.child(lastPicUrl);
+            await spaceRef.delete();
+            await docRef.update({'profilePic' : FieldValue.delete()});
+          }catch(_){
+
+          }
+          //await docRef.set(dataToSend);
+        }
+        await docRef.set(dataToSend);
+
+        await getAttachments();
+  }
+    }
+  }*/
+  
   Future<String> _uploadImage(File imageFile) async {
-    String userId = FirebaseAuth.instance.currentUser!.uid;
-    String fileName = 'scanned_images/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    try{
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+      String fileName = '$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-    Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
-    UploadTask uploadTask = storageRef.putFile(imageFile);
-    await uploadTask.whenComplete(() => null);
+      /*Reference storageRef = FirebaseStorage.instance.ref();//.child(fileName);
+      UploadTask uploadTask = storageRef.putFile(imageFile);
+      
+      
+      
+      //await uploadTask.whenComplete(() => null);
 
-    String downloadUrl = await storageRef.getDownloadURL();
-    return downloadUrl;
+      String downloadUrl = await storageRef.getDownloadURL();*/
+
+      Reference referenceRoot = FirebaseStorage.instance.ref();
+      Reference referenceFolderImg = referenceRoot.child('images');
+
+      final metadata = SettableMetadata(
+        contentType: 'image/png',
+        customMetadata: {'picked-file-path': imageFile.path},
+      );
+
+      Reference referenceImgToUpload = referenceFolderImg.child(fileName);
+
+      UploadTask uploadTask = referenceImgToUpload.putData(await imageFile.readAsBytes(), metadata);
+      await uploadTask.whenComplete(() => () async{
+
+      });
+
+      var x = (await referenceImgToUpload.getDownloadURL());
+      return x;
+
+      /*uploadTask.whenComplete(() => () async{
+
+      });*/
+      
+      //return downloadUrl;
+    }catch(e){
+      print(e);
+    }
+
+    return '';
+
   }
 
   Future<void> _saveScanResult(String imageUrl, String scanResult) async {
@@ -174,7 +266,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                       onPressed: () async {
                         try {
                           var uri =
-                          Uri.parse('http://172.20.10.2:5000/predict');
+                          Uri.parse('http://192.168.1.208:5000/predict');
                           var request = http.MultipartRequest('POST', uri)
                             ..files.add(await http.MultipartFile.fromPath(
                               'file',
