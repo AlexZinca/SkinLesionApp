@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'medical_history.dart';
 
 //await Firebase.initializeApp(
 //options: DefaultFirebaseOptions.currentPlatform,
@@ -67,37 +68,46 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
               SizedBox(height: 8),
-              Container(
-                height: 125,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      spreadRadius: 0,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.description, color: Colors.white, size: 40),
-                    SizedBox(height: 4),
-                    Text(
-                      'MEDICAL HISTORY',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MedicalHistoryPage()),
+                  );
+                },
+                child: Container(
+                  height: 125,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.description, color: Colors.white, size: 40),
+                      SizedBox(height: 4),
+                      Text(
+                        'MEDICAL HISTORY',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+
             ],
           ),
         ),

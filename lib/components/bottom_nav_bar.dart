@@ -26,7 +26,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
   Widget build(BuildContext context) {
     return Container(
       child: GNav(
-        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 34), // Adjust padding here
+        padding: EdgeInsets.symmetric(horizontal: 35, vertical: 34), // Adjust padding here
         gap: 4, // Adjust gap between icons
         color: Colors.grey[400],
         activeColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),

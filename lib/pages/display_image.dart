@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 //import 'package:process_run/shell.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
@@ -36,6 +39,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   //late String imagePath; // Local variable to hold the image path
   late String displayImagePath;
 
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +47,28 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         widget.imagePath; // Initialize with the widget's imagePath
   }
 
+  Future<String> _uploadImage(File imageFile) async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    String fileName = 'scanned_images/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
+    Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
+    UploadTask uploadTask = storageRef.putFile(imageFile);
+    await uploadTask.whenComplete(() => null);
+
+    String downloadUrl = await storageRef.getDownloadURL();
+    return downloadUrl;
+  }
+
+  Future<void> _saveScanResult(String imageUrl, String scanResult) async {
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    await FirebaseFirestore.instance.collection('scanResults').add({
+      'userId': userId,
+      'imageUrl': imageUrl,
+      //'scanResult': scanResult,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
   Future<void> _cropImage() async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: widget.imagePath,
@@ -156,18 +181,19 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                               //widget.imagePath,
                                 displayImagePath,
                             ));
-                          print('a');
+                          var disease = '';
                           var response = await http.Response.fromStream(
                               await request.send());
 
                           if (response.statusCode == 200) {
                             var jsResponse = json.decode(response.body);
+
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 var messageValue =
                                 jsResponse['message'].toString();
-                                var disease = '';
+
                                 switch (messageValue) {
                                   case '0':
                                     disease =
@@ -200,6 +226,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                                   default:
                                     disease = 'Not cancerous';
                                 }
+
                                 return AlertDialog(
                                   title: const Text('Script Result'),
                                   content: SingleChildScrollView(
@@ -216,6 +243,10 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                                 );
                               },
                             );
+                            //var disease = _getDiseaseFromResponse(jsResponse['message'].toString());
+                            String imageUrl = await _uploadImage(File(displayImagePath));
+                            await _saveScanResult(imageUrl, disease);
+
                           } else {
                             throw Exception('Failed to load prediction');
                           }

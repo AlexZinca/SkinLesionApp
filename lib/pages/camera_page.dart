@@ -34,7 +34,7 @@ class _CameraPageState extends State<CameraPage> {
     setState(() {
       _isRearCameraSelected = !_isRearCameraSelected;
       _controller = CameraController(
-        _isRearCameraSelected ? _backCamera! : _frontCamera!,
+        _isRearCameraSelected ? (_backCamera!): _frontCamera!,
         ResolutionPreset.max,
       );
       _initializeControllerFuture = _controller!.initialize();
@@ -120,43 +120,8 @@ class _CameraPageState extends State<CameraPage> {
       }
     });
   }
-  // Method to set focus point
-  Future<void> _setFocusPoint(double x, double y) async {
-    if (_controller != null) {
-      _showFocusCircle = true;
-      _focusX = x;
-      _focusY = y;
 
-      // Convert to the Scale of 0 to 1 used by the camera for focus points
-      await _controller!.setFocusPoint(Offset(x, y));
-      await _controller!.setExposurePoint(Offset(x, y));
 
-      setState(() {});
-
-      // Hide focus circle after a delay
-      Future.delayed(Duration(seconds: 2), () {
-        setState(() {
-          _showFocusCircle = false;
-        });
-      });
-    }
-  }
-/*
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (_controller == null || !_controller!.value.isInitialized) {
-      return;
-    }
-    if (state == AppLifecycleState.inactive) {
-      _controller?.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      if (_controller != null) {
-        _requestCameraPermission();
-      }
-    }
-  }
-*/
   @override
   Widget build(BuildContext context) {
     // Obtain the size of the screen
@@ -207,11 +172,12 @@ class _CameraPageState extends State<CameraPage> {
                 right: 15.0,
                 child: Row(
                   children: [
-                    _buildIconButton(
-                      context,
-                      icon: _isTorchOn ? Icons.flash_on : Icons.flash_off,
-                      onPressed: _toggleFlash,
-                    ),
+                    if (_isRearCameraSelected)
+                      _buildIconButton(
+                        context,
+                        icon: _isTorchOn ? Icons.flash_on : Icons.flash_off,
+                        onPressed: _toggleFlash,
+                      ),
                     SizedBox(width: 15),
                     _buildIconButton(
                       context,

@@ -17,7 +17,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool automaticLogin = true;
-  bool biometricAuth = true;
+  bool biometricAuth = false;
   final FlutterSecureStorage storage = FlutterSecureStorage();
   Color switchColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7);
 

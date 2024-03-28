@@ -45,7 +45,9 @@ dependencies:
   local_auth: ^2.0.1
   email_validator: ^2.0.1
   url_launcher: ^6.0.20
-
+  animated_notch_bottom_bar: ^1.0.2
+  cloud_firestore: ^4.15.10
+  firebase_storage: ^11.6.11
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
 
