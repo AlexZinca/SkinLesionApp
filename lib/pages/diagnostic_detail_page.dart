@@ -46,28 +46,29 @@ class DiagnosticDetailPage extends StatelessWidget {
       // Replace with actual link
     ],
     'Basal cell carcinoma': [
-      'https://www.mayoclinic.org/diseases-conditions/basal-cell-carcinoma/symptoms-causes/syc-20370087',
+
       'https://www.skincancer.org/skin-cancer-information/basal-cell-carcinoma/',
       // Replace with actual link
       'https://www.aad.org/public/diseases/skin-cancer/types/common/bcc',
+      'https://www.healthdirect.gov.au/basal-cell-carcinoma',
       // Replace with actual link
     ],
     // Add other diseases and their links
-    'Bening keratosis': [
-      'https://www.aad.org/public/diseases/a-z/seborrheic-keratoses-overview',
+    'Benign keratosis': [
+      'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10188172/',
       // Overview of seborrheic keratoses from the American Academy of Dermatology
       'https://www.mayoclinic.org/diseases-conditions/seborrheic-keratosis/symptoms-causes/syc-20353878',
       // Mayo Clinic's page on seborrheic keratosis
-      'https://www.skincancer.org/skin-cancer-information/seborrheic-keratoses/',
+      'https://www.aad.org/public/diseases/a-z/seborrheic-keratoses-treatment',
       // Information on seborrheic keratoses from The Skin Cancer Foundation
     ],
 
     'Dermatofibroma': [
       'https://www.dermnetnz.org/topics/dermatofibroma/',
       // DermNet NZ offers a comprehensive guide on dermatofibroma
-      'https://www.aad.org/public/diseases/a-z/dermatofibroma',
+      'https://www.ncbi.nlm.nih.gov/books/NBK470538/',
       // The American Academy of Dermatology's resource on dermatofibroma
-      'https://www.mayoclinic.org/diseases-conditions/dermatofibroma/symptoms-causes/syc-20371769',
+      'https://www.medicalnewstoday.com/articles/318870#treatment',
       // Mayo Clinic's overview of dermatofibroma
     ],
 
@@ -81,20 +82,20 @@ class DiagnosticDetailPage extends StatelessWidget {
     ],
 
     'Melanocytic nevi': [
-      'https://www.aad.org/public/diseases/a-z/moles',
+      'https://emedicine.medscape.com/article/1058445-overview?form=fpf',
       // American Academy of Dermatology's resource on moles (melanocytic nevi)
-      'https://www.dermnetnz.org/topics/naevi/',
+      'https://emedicine.medscape.com/article/1058445-clinical?form=fpf',
       // DermNet NZ's comprehensive guide on melanocytic nevi
-      'https://www.mayoclinic.org/diseases-conditions/moles/symptoms-causes/syc-20375382',
+      'https://www.ncbi.nlm.nih.gov/books/NBK470451/',
       // Mayo Clinic's overview of moles
     ],
 
     'Vascular lesions': [
       'https://www.dermnetnz.org/topics/capillary-vascular-malformation/',
       // DermNet NZ on capillary vascular malformations
-      'https://www.aad.org/public/diseases/a-z/birthmarks',
+      'https://dermoscopedia.org/Vascular_lesions',
       // American Academy of Dermatology on birthmarks (including vascular lesions)
-      'https://www.mayoclinic.org/diseases-conditions/hemangioma/symptoms-causes/syc-20352352',
+      'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7007481/',
       // Mayo Clinic's resource on hemangiomas
     ],
   };

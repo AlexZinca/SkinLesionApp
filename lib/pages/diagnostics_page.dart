@@ -57,42 +57,44 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
               children: [
               SizedBox(height: 30), // Space before the list starts
           ...diagnostics.map((diagnostic) {
-          return Card(
-            margin: const EdgeInsets.only(bottom: 10.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            child: Stack(
-              children: [
-                ListTile(
-                  contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                  title: Text(diagnostic['name']!),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DiagnosticDetailPage(name: diagnostic['name']!),
-                      ),
-                    );
-                  },
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DiagnosticDetailPage(name: diagnostic['name']!),
                 ),
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  right: 0,
-                  child: ClipPath(
-                    clipper: DiagonalClipper(),
-                    child: Container(
-                      width: 80, // Adjust the width of the blue area here
-                      color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 30.0),
-                      child: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
-                    ),
+              );
+            },
+            child: Card(
+              margin: const EdgeInsets.only(bottom: 10.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Stack(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    title: Text(diagnostic['name']!),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    child: ClipPath(
+                      clipper: DiagonalClipper(),
+                      child: Container(
+                        width: 80, // Adjust the width of the blue area here
+                        color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 30.0),
+                          child: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
