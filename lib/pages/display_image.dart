@@ -47,78 +47,11 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         widget.imagePath; // Initialize with the widget's imagePath
   }
 
-  
-/*  void x () async{
-    var databaseReference = FirebaseFirestore.instance;
-    CollectionReference collectionRef = databaseReference.collection('${Globals.qSN!.toLowerCase()}_attachments');
 
-    ImagePicker imagePicker = ImagePicker();
-    XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
-
-    if(file == null) return;
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceFolderImg = referenceRoot.child('images');
-
-    final metadata = SettableMetadata(
-      contentType: 'image/jpeg',
-      customMetadata: {'picked-file-path': file.path},
-    );
-
-    Reference referenceImgToUpload = referenceFolderImg.child(uniqueFileName);
-
-    UploadTask uploadTask = referenceImgToUpload.putData(await file.readAsBytes(), metadata);
-
-    try{
-
-      uploadTask.whenComplete(()async{
-        final profilePicUrl = await referenceImgToUpload.getDownloadURL();
-        //profilePictureUrl = profilePicUrl;
-        print(profilePicUrl);
-
-        Map<String, String> dataToSend = {
-          'profilePic' : profilePicUrl
-        };
-
-        DocumentReference docRef = collectionRef.doc(Globals.usEmail);
-
-        var obj = await docRef.get();
-
-        if(obj.exists) {
-
-
-
-          try{
-            String lastPicUrl =  obj.get('profilePic');
-            final storageRef = FirebaseStorage.instance.ref();
-            final spaceRef = storageRef.child(lastPicUrl);
-            await spaceRef.delete();
-            await docRef.update({'profilePic' : FieldValue.delete()});
-          }catch(_){
-
-          }
-          //await docRef.set(dataToSend);
-        }
-        await docRef.set(dataToSend);
-
-        await getAttachments();
-  }
-    }
-  }*/
-  
   Future<String> _uploadImage(File imageFile) async {
     try{
       String userId = FirebaseAuth.instance.currentUser!.uid;
       String fileName = '$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      /*Reference storageRef = FirebaseStorage.instance.ref();//.child(fileName);
-      UploadTask uploadTask = storageRef.putFile(imageFile);
-      
-      
-      
-      //await uploadTask.whenComplete(() => null);
-
-      String downloadUrl = await storageRef.getDownloadURL();*/
 
       Reference referenceRoot = FirebaseStorage.instance.ref();
       Reference referenceFolderImg = referenceRoot.child('images');
@@ -157,10 +90,11 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     await FirebaseFirestore.instance.collection('scanResults').add({
       'userId': userId,
       'imageUrl': imageUrl,
-      //'scanResult': scanResult,
+      'scanResult': scanResult,
       'timestamp': FieldValue.serverTimestamp(),
     });
   }
+
   Future<void> _cropImage() async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: widget.imagePath,
@@ -266,7 +200,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                       onPressed: () async {
                         try {
                           var uri =
-                          Uri.parse('http://192.168.1.208:5000/predict');
+                          Uri.parse('http://192.168.0.87:5000/predict');
                           var request = http.MultipartRequest('POST', uri)
                             ..files.add(await http.MultipartFile.fromPath(
                               'file',
