@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'diagnostics_page.dart';
 import 'firebase_options.dart';
 import 'medical_history.dart';
 
@@ -56,13 +57,27 @@ class _MainPageState extends State<MainPage> {
                     child: widgetContainer(
                       icon: Icons.local_hospital_rounded,
                       text: 'CLINIC',
+                      onTap: () {
+                        // Navigate to DiagnosticsPage or another page as needed
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DiagnosticsPage()),
+                        );
+                      },
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: widgetContainer(
                       icon: Icons.photo_album_rounded,
-                      text: 'DIAGNOSE',
+                      text: 'DIAGNOSTICS',
+                      onTap: () {
+                        // Navigate to DiagnosticsPage
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DiagnosticsPage()),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -115,37 +130,43 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget widgetContainer({required IconData icon, required String text}) {
-    return Container(
-      height: 125,
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            spreadRadius: 0,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon,
-              color: Colors.white,
-              size: 40), // Icon size consistent with Medical History
-          SizedBox(height: 4), // Space between icon and text
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 15, // Text size consistent with Medical History
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+  Widget widgetContainer({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap, // Add this line
+  }) {
+    return InkWell( // Changed to InkWell for visual feedback on tap
+      onTap: onTap, // Use the onTap parameter here
+      borderRadius: BorderRadius.circular(20), // Match the container's borderRadius for the ripple effect
+      child: Container(
+        height: 125,
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              spreadRadius: 0,
+              blurRadius: 10,
+              offset: Offset(0, 4),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 40),
+            SizedBox(height: 4),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,17 +1,18 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:io';
 import 'package:intl/intl.dart';
+
+import 'diagnostic_detail_page.dart';
 
 class ScanResult {
   final String imageUrl;
   final String scanResult;
   final DateTime timestamp;
+  final String isCancerous;
 
-  ScanResult({required this.imageUrl, required this.scanResult, required this.timestamp});
+  ScanResult({required this.imageUrl, required this.scanResult, required this.timestamp, required this.isCancerous});
 }
 List<dynamic> _transformListWithHeaders(List<ScanResult> results) {
   if (results.isEmpty) return [];
@@ -60,6 +61,7 @@ Future<List<ScanResult>> fetchScanResults() async {
     return ScanResult(
       imageUrl: doc['imageUrl'],
       scanResult: doc['scanResult'],
+      isCancerous: doc['isCancerous'],
       timestamp: (doc['timestamp'] as Timestamp).toDate(),
     );
   }).toList();
@@ -120,7 +122,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
                       child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 10.0),
                         padding: const EdgeInsets.all(9.0),
-                        constraints: BoxConstraints(maxWidth: 230, minWidth: 230), // Use constraints for width
+                        constraints: BoxConstraints(maxWidth: 230, minWidth: 200), // Use constraints for width
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7), // Background color
                           borderRadius: BorderRadius.circular(20.0), // Rounded corners
@@ -136,30 +138,99 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
                       ),
                     );
                   } else if (item is ScanResult) {
-                    final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(item.timestamp);
                     return Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                       elevation: 2,
-                      child: ListTile(
-                        leading: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => Dialog(
-                                child: Container(
-                                  padding: EdgeInsets.all(20),
-                                  child: Image.network(item.imageUrl),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch, // Make widgets stretch to fill the card height
+                          children: [
+                            // Padding around the ClipRRect for the image
+                            Padding(
+                              padding: const EdgeInsets.all(0.0), // Adjust the padding as needed
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20.0), // Rounded corners for the image
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => Dialog(
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(20.0), // Adjust this value to control the roundness of the corners
+                                          child: Image.network(item.imageUrl, fit: BoxFit.cover),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Image.network(item.imageUrl, width: 80, height: 80, fit: BoxFit.cover),
+                                ),
+                              ),
+                            ),
+                            // Spacer between image and text/info button
+                            // Spacer between image and text/info button
+                            SizedBox(width: 20),
+                            // Text information in the middle
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.scanResult,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '${item.isCancerous}\n',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: 'Date: ${DateFormat('dd/MM/yyyy HH:mm').format(item.timestamp)}',
+                                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                                          ),
+                                        ],
+                                        style: TextStyle(color: Colors.black), // Default text color
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Info button on the right
+                      Padding(
+                        padding: EdgeInsets.only(right: 20.0), // Adjust the padding value as needed
+                        child: IconButton(
+                          icon: Icon(Icons.info_outline, color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DiagnosticDetailPage(
+                                  name: item.scanResult,
+                                  //description: "Here you can put the detailed description related to this diagnostic.",
                                 ),
                               ),
                             );
                           },
-                          child: Image.network(item.imageUrl, width: 100, height: 100, fit: BoxFit.cover),
                         ),
-                        title: Text(item.scanResult),
-                        subtitle: Text('Date: ${DateFormat('dd/MM/yyyy HH:mm').format(item.timestamp)}'),
+                      ),
+
+
+                          ],
+                        ),
                       ),
                     );
+
                   } else {
                     return SizedBox.shrink(); // This line should not be reached
                   }

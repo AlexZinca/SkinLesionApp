@@ -84,13 +84,14 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
   }
 
-  Future<void> _saveScanResult(String imageUrl, String scanResult) async {
+  Future<void> _saveScanResult(String imageUrl, String scanResult, String isCancerous) async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
     await FirebaseFirestore.instance.collection('scanResults').add({
       'userId': userId,
       'imageUrl': imageUrl,
       'scanResult': scanResult,
+      'isCancerous': isCancerous,
       'timestamp': FieldValue.serverTimestamp(),
     });
   }
@@ -208,6 +209,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                                 displayImagePath,
                             ));
                           var disease = '';
+                          var diseaseR = '';
                           var response = await http.Response.fromStream(
                               await request.send());
 
@@ -223,40 +225,48 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                                 switch (messageValue) {
                                   case '0':
                                     disease =
-                                    'Actinic keratoses and intraepithelial carcinoma / Bowen"s disease\n Considered to be precancerous';
+                                    'Actinic keratoses and intraepithelial carcinoma / Bowen"s disease';
+                                    diseaseR = 'Considered to be precancerous';
                                     break; // The switch statement must be told to exit, or it will execute every case.
                                   case '1':
                                     disease =
-                                    'Basal cell carcinom\nConsidered to be the most common form of skin cancer';
+                                    'Basal cell carcinom';
+                                    diseaseR = 'Considered to be the most common form of skin cancer';
                                     break;
                                   case '2':
                                     disease =
-                                    'Benign keratosis\nNot considered cancerous ';
+                                    'Benign keratosis';
+                                    diseaseR = 'Not considered cancerous';
                                     break;
                                   case '3':
                                     disease =
-                                    'Dermatofibroma\nNot considered cancerous';
+                                    'Dermatofibroma';
+                                    diseaseR = 'Not considered cancerous';
                                     break;
                                   case '4':
                                     disease =
-                                    'Melanoma\nConsidered to be the most serious form of skin cancer';
+                                    'Melanoma';
+                                    diseaseR = 'Considered to be the most serious form of skin cancer';
                                     break;
                                   case '5':
                                     disease =
-                                    'Melanocytic nevi\nNot considered cancerous';
+                                    'Melanocytic nevi';
+                                    diseaseR = 'Not considered cancerous';
                                     break;
                                   case '6':
                                     disease =
-                                    'Vascular lesions\nNot considered cancerous';
+                                    'Vascular lesions';
+                                    diseaseR = 'Not considered cancerous';
                                     break;
                                   default:
                                     disease = 'Not cancerous';
+                                    diseaseR = "";
                                 }
 
                                 return AlertDialog(
                                   title: const Text('Script Result'),
                                   content: SingleChildScrollView(
-                                    child: Text(disease),
+                                    child: Text(disease +'\n'+diseaseR),
                                   ),
                                   actions: <Widget>[
                                     TextButton(
@@ -271,7 +281,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                             );
                             //var disease = _getDiseaseFromResponse(jsResponse['message'].toString());
                             String imageUrl = await _uploadImage(File(displayImagePath));
-                            await _saveScanResult(imageUrl, disease);
+                            await _saveScanResult(imageUrl, disease, diseaseR);
 
                           } else {
                             throw Exception('Failed to load prediction');
