@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_camera/pages/clinics_page.dart';
 import 'diagnostics_page.dart';
 import 'firebase_options.dart';
 import 'medical_history.dart';
@@ -56,12 +57,12 @@ class _MainPageState extends State<MainPage> {
                   Expanded(
                     child: widgetContainer(
                       icon: Icons.local_hospital_rounded,
-                      text: 'CLINIC',
+                      text: 'CLINICS',
                       onTap: () {
                         // Navigate to DiagnosticsPage or another page as needed
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => DiagnosticsPage()),
+                          MaterialPageRoute(builder: (context) => ClinicsPage()),
                         );
                       },
                     ),

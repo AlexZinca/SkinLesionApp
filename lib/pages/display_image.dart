@@ -201,7 +201,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                       onPressed: () async {
                         try {
                           var uri =
-                          Uri.parse('http://192.168.0.87:5000/predict');
+                          Uri.parse('http://192.168.1.128:5000/predict');
                           var request = http.MultipartRequest('POST', uri)
                             ..files.add(await http.MultipartFile.fromPath(
                               'file',

@@ -181,7 +181,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
                                     Text(
                                       item.scanResult,
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.normal,
                                       ),
                                     ),
                                     RichText(
@@ -208,7 +208,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
                             ),
                             // Info button on the right
                       Padding(
-                        padding: EdgeInsets.only(right: 20.0), // Adjust the padding value as needed
+                        padding: EdgeInsets.only(right: 10.0), // Adjust the padding value as needed
                         child: IconButton(
                           icon: Icon(Icons.info_outline, color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)),
                           onPressed: () {

@@ -139,7 +139,7 @@ class DiagnosticDetailPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 0),
             Padding(
               padding: EdgeInsets.fromLTRB(30.0, 0 , 30, 0 ), // Adjust this padding as needed
               child: Container(
@@ -149,15 +149,16 @@ class DiagnosticDetailPage extends StatelessWidget {
 
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 60),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 getDiseaseDescription(name),
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black54), // Make the text inclined
                 textAlign: TextAlign.center,
               ),
-            ),
+            )
+
             //... Add any additional content you want on this page
           ],
         ),
