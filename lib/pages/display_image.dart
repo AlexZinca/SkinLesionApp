@@ -201,13 +201,15 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                       onPressed: () async {
                         try {
                           var uri =
-                          Uri.parse('http://192.168.1.128:5000/predict');
+                         // Uri.parse('http://192.168.1.128:5000/predict');
+                          Uri.parse('https://hello-mwr67lwjrq-ew.a.run.app/');
                           var request = http.MultipartRequest('POST', uri)
                             ..files.add(await http.MultipartFile.fromPath(
                               'file',
                               //widget.imagePath,
                                 displayImagePath,
                             ));
+                          //var response = await http.get(uri);
                           var disease = '';
                           var diseaseR = '';
                           var response = await http.Response.fromStream(
@@ -220,7 +222,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                               context: context,
                               builder: (BuildContext context) {
                                 var messageValue =
-                                jsResponse['message'].toString();
+                                jsResponse['data'].toString();
 
                                 switch (messageValue) {
                                   case '0':
