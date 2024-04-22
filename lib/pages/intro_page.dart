@@ -20,15 +20,36 @@ class _IntroPageState extends State<IntroPage> {
   final TextEditingController usernameController = TextEditingController();
 
   bool _passwordVisible = false;
-  bool rememberCredentials = false;
+  bool automaticLogin = false;
   final storage = FlutterSecureStorage();
-  bool biometricAuth = false;
+
 
   @override
   void initState() {
     super.initState();
-    _loadUserCredentials();
-    _loadBiometricAuthStatus();
+    _checkAutomaticLoginAndLoadCredentials();
+  }
+
+  Future<void> _checkAutomaticLoginAndLoadCredentials() async {
+    String? autoLogin = await storage.read(key: 'automaticLogin');
+    setState(() {
+      automaticLogin = autoLogin == 'true';
+    });
+
+    if (automaticLogin) {
+      await _loadUserCredentials();
+    }
+  }
+
+  Future<void> _loadUserCredentials() async {
+    String? userEmail = await storage.read(key: 'userEmail');
+    String? userPassword = await storage.read(key: 'userPassword');
+    if (userEmail != null && userPassword != null) {
+      setState(() {
+        emailController.text = userEmail;
+        passwordController.text = userPassword;
+      });
+    }
   }
 
   @override
@@ -38,12 +59,6 @@ class _IntroPageState extends State<IntroPage> {
     // Call this again in case settings changed while this page wasn't visible
   }
 
-  Future<void> _loadBiometricAuthStatus() async {
-    String? biometricAuthEnabled = await storage.read(key: 'biometricAuth');
-    setState(() {
-      biometricAuth = biometricAuthEnabled == 'true';
-    });
-  }
 
   Future<void> _authenticateWithBiometrics() async {
     var localAuth = LocalAuthentication();
@@ -132,49 +147,6 @@ class _IntroPageState extends State<IntroPage> {
         ],
       ),
     );
-  }
-
-  Future<void> _loadUserCredentials() async {
-    final storage = FlutterSecureStorage();
-
-    // Load general remember credentials preference.
-    String? remember = await storage.read(key: 'rememberCredentials');
-    bool shouldRemember = remember == 'true';
-
-    // Update the rememberCredentials state without affecting text fields directly.
-    setState(() {
-      rememberCredentials = shouldRemember;
-    });
-
-    // Only proceed to autofill credentials if coming from a logout with 'Automatic login' enabled.
-    String? fromLogout = await storage.read(key: 'loggingOut');
-    if (fromLogout == 'true') {
-      await storage.delete(
-          key: 'loggingOut'); // Clear the 'loggingOut' flag after checking.
-
-      if (shouldRemember) {
-        // Autofill credentials only if they should be remembered.
-        String? userEmail = await storage.read(key: 'userEmail');
-        String? userPassword = await storage.read(key: 'userPassword');
-
-        if (userEmail != null && userPassword != null) {
-          setState(() {
-            emailController.text = userEmail;
-            passwordController.text = userPassword;
-          });
-        }
-      }
-    }
-  }
-
-  Future<void> _rememberUserCredentials() async {
-    if (rememberCredentials) {
-      await storage.write(key: 'userEmail', value: emailController.text);
-      await storage.write(key: 'userPassword', value: passwordController.text);
-    } else {
-      await storage.delete(key: 'userEmail');
-      await storage.delete(key: 'userPassword');
-    }
   }
 
   @override
@@ -278,7 +250,7 @@ class _IntroPageState extends State<IntroPage> {
                     style:
                         TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
                 SizedBox(height: 3),
-                Text('Please sign in to continue',
+                Text('Please log in to continue',
                     style: TextStyle(fontSize: 15, color: Colors.grey)),
                 SizedBox(height: 40),
                 // Email TextField with shadow
@@ -328,27 +300,27 @@ class _IntroPageState extends State<IntroPage> {
                       child: InkWell(
                         onTap: () {
                           setState(() {
-                            rememberCredentials = !rememberCredentials;
+                            automaticLogin = !automaticLogin;
                           });
                           storage.write(
-                              key: 'rememberCredentials',
-                              value: rememberCredentials ? 'true' : 'false');
+                              key: 'automaticLogin',
+                              value: automaticLogin ? 'true' : 'false');
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Checkbox(
-                              value: rememberCredentials,
+                              value: automaticLogin,
                               activeColor: Color.fromARGB(255, 94, 184, 209)
                                   .withOpacity(0.7),
                               onChanged: (bool? value) {
                                 setState(() {
-                                  rememberCredentials = value!;
+                                  automaticLogin = value!;
                                 });
                                 storage.write(
-                                    key: 'rememberCredentials',
+                                    key: 'automaticLogin',
                                     value:
-                                        rememberCredentials ? 'true' : 'false');
+                                        automaticLogin ? 'true' : 'false');
                               },
                             ),
                             SizedBox(
@@ -356,12 +328,12 @@ class _IntroPageState extends State<IntroPage> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  rememberCredentials = !rememberCredentials;
+                                  automaticLogin = !automaticLogin;
                                 });
                                 storage.write(
-                                    key: 'rememberCredentials',
+                                    key: 'automaticLogin',
                                     value:
-                                        rememberCredentials ? 'true' : 'false');
+                                        automaticLogin ? 'true' : 'false');
                               },
                               child: Text(
                                 "Remember credentials",
@@ -458,6 +430,7 @@ class _IntroPageState extends State<IntroPage> {
                 SizedBox(height: 20),
 
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: InkWell(
@@ -491,7 +464,7 @@ class _IntroPageState extends State<IntroPage> {
                             );
 
                             if (authResult.user != null) {
-                              if (rememberCredentials) {
+                              if (automaticLogin) {
                                 await storage.write(key: 'userEmail', value: emailController.text);
                                 await storage.write(key: 'userPassword', value: passwordController.text);
                               } else {
@@ -534,42 +507,9 @@ class _IntroPageState extends State<IntroPage> {
                           ),
                         ),
                       ),
-                    ),
-                    biometricAuth ? SizedBox(width: 10) : SizedBox.shrink(), // Provide spacing only if biometricAuth is true
-                    biometricAuth
-                        ? Container(
-                      height: 60, // Fixed height for circular button
-                      width: 60,  // Fixed width for circular button
-                      child: InkWell(
-                        onTap: _authenticateWithBiometrics,
-                        child: Center(
-                          child: Container(
-                            height: 60, // Adjust the size of the Face ID image
-                            width: 60,
-                            decoration: loginButtonDecoration.copyWith(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 151, 199, 212).withOpacity(0.7),
-                                  Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ), // Ensures the image is circular
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0), // Padding to adjust the image inside the circular decoration
-                              child: Image.asset(
-                                'lib/images/faceid.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     )
-                        : SizedBox.shrink(),  // Don't display anything if biometricAuth is false
                   ],
-                ),
+                )
 
               ],
             ),

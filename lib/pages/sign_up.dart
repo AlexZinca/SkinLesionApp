@@ -5,6 +5,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Make sure Firebase is initialized in your project
 import 'package:flutter/widgets.dart';
 import 'package:my_camera/pages/intro_page.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SignUp extends StatefulWidget {
   SignUp({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController confirmPasswordController = TextEditingController();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+  final storage = FlutterSecureStorage();
 
   void _register() async {
     if (!EmailValidator.validate(emailController.text)) {
@@ -48,7 +50,11 @@ class _SignUpState extends State<SignUp> {
       );
 
       if (userCredential.user != null) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => IntroPage()));
+        await storage.write(key: 'biometricPromptOnLogin', value: 'false');
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => IntroPage())).then((_) {
+          // Ensure biometricPromptOnLogin is set to false when navigating back
+          storage.write(key: 'biometricPromptOnLogin', value: 'false');
+        });
       }
     } on FirebaseAuthException catch (e) {
       String errorMessage = 'An error occurred during registration. Please try again.';
@@ -236,7 +242,10 @@ class _SignUpState extends State<SignUp> {
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => IntroPage()));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => IntroPage())).then((_) {
+                          // Ensure biometricPromptOnLogin is set to false when navigating back
+                          storage.write(key: 'biometricPromptOnLogin', value: 'false');
+                        });
                       },
                       child: RichText(
                         textAlign: TextAlign.center,
