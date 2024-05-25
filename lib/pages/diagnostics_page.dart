@@ -74,8 +74,15 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
               child: Stack(
                 children: [
                   ListTile(
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                    title: Text(diagnostic['name']!),
+                    contentPadding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 25.0),
+                    title: Text(
+                      diagnostic['name']!,  // Ensure 'name' exists and is a String
+                      style: TextStyle(
+                        color: Colors.black54,  // Set text color to grey
+                        //fontFamily: 'CustomFontFamily',  // Set the custom font family
+                        fontSize: 16,  // Optionally set font size
+                      ),
+                    ),
                   ),
                   Positioned(
                     top: 0,
@@ -88,7 +95,7 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
                         color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
                         child: Padding(
                           padding: EdgeInsets.only(left: 30.0),
-                          child: Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
+                          child: Icon(Icons.arrow_forward_ios, size: 18.0, color: Colors.white),
                         ),
                       ),
                     ),

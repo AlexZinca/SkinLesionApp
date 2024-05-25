@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _loadAutomaticLoginStatus();
     _loadBiometricAuthStatus();
   }
 
@@ -35,12 +35,15 @@ class _SettingsPageState extends State<SettingsPage> {
       automaticLogin = remember == 'true';
     });
   }
-  Future<void> _loadSettings() async {
-    String? autoLogin = await storage.read(key: 'automaticLogin');
+
+  Future<void> _toggleAutomaticLogin(bool value) async {
     setState(() {
-      automaticLogin = autoLogin == 'true';
+      automaticLogin = value;
     });
+    await storage.write(
+        key: 'rememberCredentials', value: automaticLogin ? 'true' : 'false');
   }
+
   Future<void> _loadBiometricAuthStatus() async {
     String? biometric = await storage.read(key: 'biometricAuth');
     setState(() {
@@ -48,17 +51,6 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  Future<void> _toggleAutomaticLogin(bool value) async {
-    setState(() {
-      automaticLogin = value;
-    });
-    await storage.write(key: 'automaticLogin', value: automaticLogin ? 'true' : 'false');
-    if (!automaticLogin) {
-      // Optionally clear credentials when automatic login is disabled
-      await storage.delete(key: 'userEmail');
-      await storage.delete(key: 'userPassword');
-    }
-  }
 
   Future<void> _toggleBiometricAuth(bool value) async {
     setState(() {

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'diagnostic_detail_page.dart';
 
 class ScanResult {
@@ -106,7 +106,11 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
         future: futureScanResults,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child:LoadingAnimationWidget.staggeredDotsWave(
+              size: 50,
+              color: Color.fromARGB(255, 151, 199, 212)
+                  .withOpacity(0.7),
+            ),);
           } else if (snapshot.hasError) {
             return Center(child: Text('Error fetching results'));
           } else if (snapshot.hasData) {

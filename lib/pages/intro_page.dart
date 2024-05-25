@@ -20,23 +20,22 @@ class _IntroPageState extends State<IntroPage> {
   final TextEditingController usernameController = TextEditingController();
 
   bool _passwordVisible = false;
-  bool automaticLogin = false;
+  bool rememberCredentials = false;
   final storage = FlutterSecureStorage();
-
 
   @override
   void initState() {
     super.initState();
-    _checkAutomaticLoginAndLoadCredentials();
+    _loadSettings();
   }
 
-  Future<void> _checkAutomaticLoginAndLoadCredentials() async {
-    String? autoLogin = await storage.read(key: 'automaticLogin');
+  Future<void> _loadSettings() async {
+    String? autoLogin = await storage.read(key: 'rememberCredentials');
     setState(() {
-      automaticLogin = autoLogin == 'true';
+      rememberCredentials = autoLogin == 'true';
     });
 
-    if (automaticLogin) {
+    if (rememberCredentials) {
       await _loadUserCredentials();
     }
   }
@@ -45,108 +44,19 @@ class _IntroPageState extends State<IntroPage> {
     String? userEmail = await storage.read(key: 'userEmail');
     String? userPassword = await storage.read(key: 'userPassword');
     if (userEmail != null && userPassword != null) {
-      setState(() {
-        emailController.text = userEmail;
-        passwordController.text = userPassword;
-      });
+      emailController.text = userEmail;
+      passwordController.text = userPassword;
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadUserCredentials();
-    // Call this again in case settings changed while this page wasn't visible
-  }
-
-
-  Future<void> _authenticateWithBiometrics() async {
-    var localAuth = LocalAuthentication();
-    bool didAuthenticate = false;
-
-    try {
-      didAuthenticate = await localAuth.authenticate(
-        localizedReason: 'Please authenticate to log in',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          useErrorDialogs: true,
-          stickyAuth: true,
-        ),
-      );
-
-      if (didAuthenticate) {
-        // Retrieve credentials only after successful authentication
-        String? userEmail = await storage.read(key: 'userEmail');
-        String? userPassword = await storage.read(key: 'userPassword');
-
-        if (userEmail != null && userPassword != null) {
-          // Autofill the credentials
-          setState(() {
-            emailController.text = userEmail;
-            passwordController.text = userPassword;
-          });
-
-          // Optionally, you can directly log the user in or wait for them to press a button
-          // Here, we invoke the login directly
-          _login(userEmail, userPassword);
-        } else {
-          // Handle the case where no credentials are available
-          _showNoCredentialsDialog();
-        }
-      }
-    } catch (e) {
-      print("Error during authentication: $e");
+  Future<void> _rememberUserCredentials() async {
+    if (rememberCredentials) {
+      await storage.write(key: 'userEmail', value: emailController.text);
+      await storage.write(key: 'userPassword', value: passwordController.text);
+    } else {
+      await storage.delete(key: 'userEmail');
+      await storage.delete(key: 'userPassword');
     }
-  }
-
-  Future<void> _login(String email, String password) async {
-    try {
-      UserCredential authResult =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-
-      if (authResult.user != null) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
-      }
-    } catch (e) {
-      String errorMessage = 'An error occurred. Please try again.';
-      if (e is FirebaseAuthException) {
-        errorMessage = e.message ?? errorMessage;
-      }
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Login Failed'),
-          content: Text(errorMessage),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void _showNoCredentialsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('No Credentials'),
-        content: Text('No saved credentials found. Please log in manually.'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -248,9 +158,9 @@ class _IntroPageState extends State<IntroPage> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.27),
                 Text('Login',
                     style:
-                        TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
                 SizedBox(height: 3),
-                Text('Please log in to continue',
+                Text('Please sign in to continue',
                     style: TextStyle(fontSize: 15, color: Colors.grey)),
                 SizedBox(height: 40),
                 // Email TextField with shadow
@@ -300,27 +210,27 @@ class _IntroPageState extends State<IntroPage> {
                       child: InkWell(
                         onTap: () {
                           setState(() {
-                            automaticLogin = !automaticLogin;
+                            rememberCredentials = !rememberCredentials;
                           });
                           storage.write(
-                              key: 'automaticLogin',
-                              value: automaticLogin ? 'true' : 'false');
+                              key: 'rememberCredentials',
+                              value: rememberCredentials ? 'true' : 'false');
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Checkbox(
-                              value: automaticLogin,
+                              value: rememberCredentials,
                               activeColor: Color.fromARGB(255, 94, 184, 209)
                                   .withOpacity(0.7),
                               onChanged: (bool? value) {
                                 setState(() {
-                                  automaticLogin = value!;
+                                  rememberCredentials = value!;
                                 });
                                 storage.write(
-                                    key: 'automaticLogin',
+                                    key: 'rememberCredentials',
                                     value:
-                                        automaticLogin ? 'true' : 'false');
+                                    rememberCredentials ? 'true' : 'false');
                               },
                             ),
                             SizedBox(
@@ -328,12 +238,12 @@ class _IntroPageState extends State<IntroPage> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  automaticLogin = !automaticLogin;
+                                  rememberCredentials = !rememberCredentials;
                                 });
                                 storage.write(
-                                    key: 'automaticLogin',
+                                    key: 'rememberCredentials',
                                     value:
-                                        automaticLogin ? 'true' : 'false');
+                                    rememberCredentials ? 'true' : 'false');
                               },
                               child: Text(
                                 "Remember credentials",
@@ -363,8 +273,8 @@ class _IntroPageState extends State<IntroPage> {
                                   child: Text('OK',
                                       style: TextStyle(
                                           color:
-                                              Color.fromARGB(255, 94, 184, 209)
-                                                  .withOpacity(0.7))),
+                                          Color.fromARGB(255, 94, 184, 209)
+                                              .withOpacity(0.7))),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ],
@@ -385,7 +295,7 @@ class _IntroPageState extends State<IntroPage> {
                                     child: Text('OK',
                                         style: TextStyle(
                                             color: Color.fromARGB(
-                                                    255, 94, 184, 209)
+                                                255, 94, 184, 209)
                                                 .withOpacity(0.7))),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
@@ -404,7 +314,7 @@ class _IntroPageState extends State<IntroPage> {
                                     child: Text('OK',
                                         style: TextStyle(
                                             color: Color.fromARGB(
-                                                    255, 94, 184, 209)
+                                                255, 94, 184, 209)
                                                 .withOpacity(0.7))),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
@@ -430,7 +340,6 @@ class _IntroPageState extends State<IntroPage> {
                 SizedBox(height: 20),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: InkWell(
@@ -464,7 +373,7 @@ class _IntroPageState extends State<IntroPage> {
                             );
 
                             if (authResult.user != null) {
-                              if (automaticLogin) {
+                              if (rememberCredentials) {
                                 await storage.write(key: 'userEmail', value: emailController.text);
                                 await storage.write(key: 'userPassword', value: passwordController.text);
                               } else {
@@ -507,9 +416,10 @@ class _IntroPageState extends State<IntroPage> {
                           ),
                         ),
                       ),
-                    )
+                    ),
+
                   ],
-                )
+                ),
 
               ],
             ),
@@ -558,7 +468,7 @@ class _IntroPageState extends State<IntroPage> {
                       text: 'Sign up',
                       style: TextStyle(
                         color:
-                            Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),

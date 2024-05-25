@@ -133,7 +133,7 @@ class DiagnosticDetailPage extends StatelessWidget {
                 child: Text(
                   name,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.black, // Text color
+                    color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7), // Text color
                   ),
                   textAlign: TextAlign.center,
                 ),
