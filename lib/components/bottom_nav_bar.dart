@@ -29,7 +29,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
         padding: EdgeInsets.symmetric(horizontal: 35, vertical: 34), // Adjust padding here
         gap: 4, // Adjust gap between icons
         color: Colors.grey[400],
-        activeColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+        activeColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         mainAxisAlignment: MainAxisAlignment.center,
         onTabChange: (value) {
           setState(() {
@@ -62,7 +62,7 @@ class _MyBottomNavBarState extends State<MyBottomNavBar> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 color: _selectedIndex == 1
-                    ? Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)
+                    ? Color.fromARGB(255, 69, 84, 162).withOpacity(0.7)
                     : Color.fromARGB(255, 170, 177, 179).withOpacity(0.7),
               ),
               child: Icon(

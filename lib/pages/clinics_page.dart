@@ -265,7 +265,7 @@ class _ClinicsPageState extends State<ClinicsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+        backgroundColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         title: const Text('CLINICS', style: TextStyle(fontSize: 18, color: Colors.white)),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -309,7 +309,7 @@ class _ClinicsPageState extends State<ClinicsPage> {
               itemBuilder: (context, index) {
                 return Card(
                   elevation: 5,
-                  color: Color.fromARGB(255, 118, 197, 218).withOpacity(0.7),
+                  color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                   child: InkWell(
                     onTap: () {
                       setState(() {

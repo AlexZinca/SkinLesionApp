@@ -95,7 +95,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+        backgroundColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         title: const Text('MEDICAL HISTORY',
             style: TextStyle(fontSize: 18, color: Colors.white)),
         centerTitle: true,
@@ -108,7 +108,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child:LoadingAnimationWidget.staggeredDotsWave(
               size: 50,
-              color: Color.fromARGB(255, 151, 199, 212)
+              color: Color.fromARGB(255, 69, 84, 162)
                   .withOpacity(0.7),
             ),);
           } else if (snapshot.hasError) {
@@ -128,7 +128,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
                         padding: const EdgeInsets.all(9.0),
                         constraints: BoxConstraints(maxWidth: 230, minWidth: 200), // Use constraints for width
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7), // Background color
+                          color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7), // Background color
                           borderRadius: BorderRadius.circular(20.0), // Rounded corners
                         ),
                         child: Text(
@@ -214,7 +214,7 @@ class _MedicalHistoryPageState extends State<MedicalHistoryPage> {
                       Padding(
                         padding: EdgeInsets.only(right: 10.0), // Adjust the padding value as needed
                         child: IconButton(
-                          icon: Icon(Icons.info_outline, color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)),
+                          icon: Icon(Icons.info_outline, color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),),
                           onPressed: () {
                             Navigator.push(
                               context,

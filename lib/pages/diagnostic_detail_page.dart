@@ -117,7 +117,7 @@ class DiagnosticDetailPage extends StatelessWidget {
     List<String> diseaseSpecificLinks = diseaseLinks[name] ?? [];
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+        backgroundColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         title: const Text('DIAGNOSTIC DETAILS',
             style: TextStyle(fontSize: 18, color: Colors.white)),
         centerTitle: true,
@@ -133,7 +133,7 @@ class DiagnosticDetailPage extends StatelessWidget {
                 child: Text(
                   name,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7), // Text color
+                    color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7), // Text color
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -145,7 +145,7 @@ class DiagnosticDetailPage extends StatelessWidget {
               child: Container(
                 height: 3.0, // Height of the line
                 width: double.infinity, // Makes the line full width within the padding
-                color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),// Color of the line
+                color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),// Color of the line
 
               ),
             ),
@@ -190,7 +190,7 @@ class DiagnosticDetailPage extends StatelessWidget {
                       margin: EdgeInsets.symmetric(horizontal: 10),// Adjusted width to accommodate the icon and padding
                       padding: EdgeInsets.all(8), // Padding inside the container
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Icon(linkIcons[index], color: Colors.white, size: 24),

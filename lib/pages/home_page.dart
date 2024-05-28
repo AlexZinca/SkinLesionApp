@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       ),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+        backgroundColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         title: Text(
           _pageTitles[_selectedIndex], // Set the title dynamically
           style: TextStyle(fontSize: 18, color: Colors.white),

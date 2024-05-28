@@ -19,7 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool automaticLogin = true;
   bool biometricAuth = false;
   final FlutterSecureStorage storage = FlutterSecureStorage();
-  Color switchColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7);
+  Color switchColor = Color.fromARGB(211, 31, 46, 136).withOpacity(0.7);
 
 
   @override
@@ -114,7 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _showFeedbackDialog() async {
     final TextEditingController _feedbackController = TextEditingController();
     // Assuming `greenColor` and `textColor` are defined at the class level
-    final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7);
+    final Color greenColor = Color.fromARGB(255, 69, 84, 162).withOpacity(0.7);
     final Color textColor = Color.fromARGB(255, 145, 145, 145).withOpacity(0.7);
 
     await showDialog(
@@ -160,7 +160,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
 
   Future<void> _showAboutAppDialog() async {
-    final Color greenColor = Color.fromARGB(255, 94, 184, 209).withOpacity(0.7); // Define your green color
+    final Color greenColor = Color.fromARGB(255, 69, 84, 162).withOpacity(0.7); // Define your green color
     final textColor = Color.fromARGB(255, 145, 145, 145).withOpacity(0.7);
     // For dynamic version, use package_info package to fetch version.
     // For now, let's hardcode a version.

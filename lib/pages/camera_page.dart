@@ -313,7 +313,7 @@ class _CameraPageState extends State<CameraPage> {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Color.fromARGB(255, 151, 199, 212).withOpacity(0.7),
+        color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.25),
@@ -364,8 +364,8 @@ class _CameraPageState extends State<CameraPage> {
 final BoxDecoration loginButtonDecoration = BoxDecoration(
   gradient: LinearGradient(
     colors: [
-      Color.fromARGB(255, 151, 199, 212).withOpacity(0.7),
-      Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+      Color.fromARGB(255, 98, 110, 173).withOpacity(0.7),
+      Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

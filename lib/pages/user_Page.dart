@@ -20,7 +20,7 @@ class _UserPageState extends State<UserPage> {
             CircleAvatar(
               radius: 40,
               backgroundColor:
-              Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+              Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
               child: Text(
                 'AZ',
                 style: TextStyle(fontSize: 20, color: Colors.white),

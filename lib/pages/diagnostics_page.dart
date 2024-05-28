@@ -45,7 +45,7 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+        backgroundColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
         title: const Text('DIAGNOSTICS',
             style: TextStyle(fontSize: 18, color: Colors.white)),
         centerTitle: true,
@@ -55,7 +55,7 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
               children: [
-              SizedBox(height: 30), // Space before the list starts
+              SizedBox(height: 16), // Space before the list starts
           ...diagnostics.map((diagnostic) {
           return GestureDetector(
             onTap: () {
@@ -74,7 +74,7 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
               child: Stack(
                 children: [
                   ListTile(
-                    contentPadding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 25.0),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 25.0),
                     title: Text(
                       diagnostic['name']!,  // Ensure 'name' exists and is a String
                       style: TextStyle(
@@ -92,7 +92,7 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
                       clipper: DiagonalClipper(),
                       child: Container(
                         width: 80, // Adjust the width of the blue area here
-                        color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                         child: Padding(
                           padding: EdgeInsets.only(left: 30.0),
                           child: Icon(Icons.arrow_forward_ios, size: 18.0, color: Colors.white),

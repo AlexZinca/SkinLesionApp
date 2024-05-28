@@ -51,7 +51,7 @@ class _BiometricLoginPageState extends State<BiometricLoginPage> {
               'SkinSight',
               style: TextStyle(
                 fontSize: 28.0,
-                color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                 fontWeight: FontWeight.bold,
               ),
             ),

@@ -105,8 +105,8 @@ class _IntroPageState extends State<IntroPage> {
     final BoxDecoration loginButtonDecoration = BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          Color.fromARGB(255, 151, 199, 212).withOpacity(0.7),
-          Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+          Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
+          Color.fromARGB(255, 255, 255, 255).withOpacity(0.7),
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -140,7 +140,7 @@ class _IntroPageState extends State<IntroPage> {
                     gradient: LinearGradient(
                       colors: [
                         Color.fromARGB(255, 255, 255, 255).withOpacity(0.7),
-                        Color.fromARGB(255, 110, 196, 219).withOpacity(0.7),
+                        Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                       ],
                       begin: Alignment.topRight,
                       end: Alignment.bottomRight,
@@ -221,8 +221,7 @@ class _IntroPageState extends State<IntroPage> {
                           children: <Widget>[
                             Checkbox(
                               value: rememberCredentials,
-                              activeColor: Color.fromARGB(255, 94, 184, 209)
-                                  .withOpacity(0.7),
+                              activeColor: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                               onChanged: (bool? value) {
                                 setState(() {
                                   rememberCredentials = value!;
@@ -250,8 +249,7 @@ class _IntroPageState extends State<IntroPage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  color: Color.fromARGB(255, 94, 184, 209)
-                                      .withOpacity(0.7),
+                                  color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                                 ),
                               ),
                             ),
@@ -273,8 +271,7 @@ class _IntroPageState extends State<IntroPage> {
                                   child: Text('OK',
                                       style: TextStyle(
                                           color:
-                                          Color.fromARGB(255, 94, 184, 209)
-                                              .withOpacity(0.7))),
+                                          Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),)),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ],
@@ -294,9 +291,7 @@ class _IntroPageState extends State<IntroPage> {
                                   TextButton(
                                     child: Text('OK',
                                         style: TextStyle(
-                                            color: Color.fromARGB(
-                                                255, 94, 184, 209)
-                                                .withOpacity(0.7))),
+                                            color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),)),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
                                   ),
@@ -313,9 +308,7 @@ class _IntroPageState extends State<IntroPage> {
                                   TextButton(
                                     child: Text('OK',
                                         style: TextStyle(
-                                            color: Color.fromARGB(
-                                                255, 94, 184, 209)
-                                                .withOpacity(0.7))),
+                                            color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),)),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
                                   ),
@@ -329,8 +322,7 @@ class _IntroPageState extends State<IntroPage> {
                         'Forgot?',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color.fromARGB(255, 94, 184, 209)
-                              .withOpacity(0.7),
+                          color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                         ),
                       ),
                     ),
@@ -355,7 +347,7 @@ class _IntroPageState extends State<IntroPage> {
                                     child: Text(
                                       'OK',
                                       style: TextStyle(
-                                        color: Color.fromARGB(255, 94, 184, 209),
+                                        color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                                       ),
                                     ),
                                     onPressed: () => Navigator.of(context).pop(),
@@ -393,7 +385,7 @@ class _IntroPageState extends State<IntroPage> {
                                     child: Text(
                                       'OK',
                                       style: TextStyle(
-                                        color: Color.fromARGB(255, 94, 184, 209),
+                                        color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                                       ),
                                     ),
                                     onPressed: () => Navigator.of(context).pop(),
@@ -438,7 +430,7 @@ class _IntroPageState extends State<IntroPage> {
                     gradient: LinearGradient(
                       colors: [
                         //Color.fromARGB(255, 210, 238, 245).withOpacity(0.7),
-                        Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                         Color.fromARGB(255, 255, 255, 255).withOpacity(0.7),
                       ],
                       begin: Alignment.topLeft,
@@ -468,7 +460,7 @@ class _IntroPageState extends State<IntroPage> {
                       text: 'Sign up',
                       style: TextStyle(
                         color:
-                        Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                        Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),

@@ -78,7 +78,7 @@ class _SignUpState extends State<SignUp> {
           content: Text(content),
           actions: <Widget>[
             TextButton(
-              child: Text('OK', style: TextStyle(color: Color.fromARGB(255, 94, 184, 209))),
+              child: Text('OK', style: TextStyle(color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -135,7 +135,7 @@ class _SignUpState extends State<SignUp> {
 
     final BoxDecoration loginButtonDecoration = BoxDecoration(
       gradient: LinearGradient(
-        colors: [Color.fromARGB(255, 151, 199, 212).withOpacity(0.7), Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)],
+        colors: [Color.fromARGB(255, 69, 84, 162).withOpacity(0.7), Color.fromARGB(255, 255, 255, 255).withOpacity(0.7)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
@@ -153,12 +153,12 @@ class _SignUpState extends State<SignUp> {
         children: [
           Positioned(
             top: -100, // Adjusted for top right alignment
-            right: -40, // Adjusted for top right alignment
+            right: -35, // Adjusted for top right alignment
             child: CircleDecoration(
               diameter: 300,
               gradient: LinearGradient(
-                colors: [Color.fromARGB(255, 151, 199, 212).withOpacity(0.7), Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)],
-                begin: Alignment.topLeft,
+                colors: [  Color.fromARGB(255, 255, 255, 255).withOpacity(0.7), Color.fromARGB(255, 69, 84, 162).withOpacity(0.7)],
+                begin: Alignment.topRight,
                 end: Alignment.bottomRight,
               ),
             ),
@@ -169,7 +169,7 @@ class _SignUpState extends State<SignUp> {
             child: CircleDecoration(
               diameter: 400,
               gradient: LinearGradient(
-                colors: [Color.fromARGB(255, 151, 199, 212).withOpacity(0.7), Color.fromARGB(255, 94, 184, 209).withOpacity(0.7)],
+                colors: [Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),   Color.fromARGB(255, 255, 255, 255).withOpacity(0.7)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -255,7 +255,7 @@ class _SignUpState extends State<SignUp> {
                           children: [
                             TextSpan(
                               text: 'Login',
-                              style: TextStyle(color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7), fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7), fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),

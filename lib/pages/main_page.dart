@@ -46,7 +46,7 @@ class _MainPageState extends State<MainPage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    'lib/images/1.png',
+                    'lib/images/img_1.png',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -95,7 +95,7 @@ class _MainPageState extends State<MainPage> {
                   height: 125,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+                    color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -142,7 +142,7 @@ class _MainPageState extends State<MainPage> {
       child: Container(
         height: 125,
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 94, 184, 209).withOpacity(0.7),
+          color: Color.fromARGB(255, 69, 84, 162).withOpacity(0.7),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
